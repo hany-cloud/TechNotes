@@ -1,0 +1,842 @@
+Lessons learned
+----------------
+	- Length for strings is a method while Length for arrays is a property.
+	- Size for collections is a method too.
+	 
+	- Math.round: The round() method returns an int when called with a float. But if we are calling it with a double,
+				  it returns a long.
+					long two = Math.round(1.0); // returns long
+					int two = Math.round(1.0f); // returns int => or long two = Math.round(1.0f); // still works
+					
+					long two = Math.round(1.5);
+					System.out.println(two); // prints 2
+	
+	String & StringBuilders
+	-------------------------
+		- StringBuffer is the same as StringBuilder except that it is thread safe.
+
+		- Calling == on String objects will check whether they point to the same object in the pool. 
+		- Calling == on StringBuilder references will check whether they are pointing to the
+		  same StringBuilder object.
+		  
+		- Calling equals() on String objects will check whether the sequence of characters is the same. 
+		- Calling equals() on StringBuilder objects will check whether they are pointing to the same object 
+		  rather than looking at the values inside.
+		  
+		- Java does not allow you to compare String and StringBuilder using == because they are 2 different classes.  
+		
+		- String intern, ==, and equals methods discussion
+				Which of the following are output by this code? (Choose all that apply.)
+					3: var s = "Hello";
+					4: var t = new String(s);
+					5: if ("Hello".equals(s)) System.out.println("one");
+					6: if (t == s) System.out.println("two");
+					7: if (t.intern() == s) System.out.println("three");
+					8: if ("Hello" == s) System.out.println("four");
+					9: if ("Hello".intern() == t) System.out.println("five");
+					A. one
+					B. two
+					C. three
+					D. four
+					E. five
+					F. The code does not compile.
+					G. None of the above
+					
+				Line 3 points to the String in the string pool. 
+				Line 4 calls the String constructor explicitly and is therefore a different object than s. 
+				Line 5 checks for object equality, which is true, and so prints one. 
+				Line 6 uses object reference equality, which is not true since we have different objects. 
+				Line 7 calls intern(), which returns the value from the string pool and is therefore the same reference as s. 
+				Line 8 also compares references but is true since both references point to the object from the string pool. 
+				Finally, line 9 is a trick. The string Hello is already in the string pool, so calling intern() does not change anything. 
+						 The reference t is a different object, so the result is still false. 
+		
+		- Know that substring() does not change the value of a StringBuilder whereas append(), delete(),
+		  and insert() do change it. 
+			-> for reminder of how the delete and insert work check question #12, #13(tricky), #14.
+		
+		- The substring & delete methods begin at the specified beginIndex and extends to the character at index endIndex - 1.
+		  In case of beginIndex is equal to endIndex it will return empty string. 
+		  In case of beginIndex is less than endIndex, an exception is thrown
+
+		- In StringBuilders there is a unique version of replace as follows:
+			public StringBuilder replace(int start,
+                             int end,
+                             String str)
+
+				Replaces the characters in a substring of this sequencewith characters in the specified String. 
+				Parameters:
+					start - The beginning index, inclusive.
+					end - The ending index, exclusive.
+					str - String that will replace previous contents.
+					
+			For example:
+				var builder = new StringBuilder("12345");
+				System.out.println(builder.substring(0, 3).toString()); // prints 123
+				System.out.println(builder.replace(0, 3, "6").toString()); // prints 645
+				System.out.println(builder.replace(0, 5, "6").toString()); // prints 6
+
+		- This statement 
+			new String("text"); 
+		  explicitly creates a new and referentially distinct instance of a String object; 
+		  String s = "text"; may reuse an instance from the string constant pool if one is available.
+		  
+				String s1 = "foobar";
+				String s2 = "foobar";
+				System.out.println(s1 == s2);      		 // true
+				System.out.println("foobar" == s2);      // true
+				
+				String r = new String("Hello");
+				System.out.println("Hello" == r);		// false
+
+
+		- In java you can not assign boolean or numeric value to string variable but you can only concatenate.
+				String a = "";
+				a += false; // OK
+				a = false;  // Not OK
+				
+				String a += ""; // complie errror, in decalaration only = is allowed
+
+	Arrays & List
+	--------------
+		- The following code is okay:
+			List monkeys = new ArrayList<>();
+			
+			List chimpanzees = new ArrayList<Integer>();
+			for(var ham : chimpanzees)
+				chimpanzee has a data type of List. Since the left side does not define a
+				generic type, the compiler will treat this as List<Object>, and ham will have a data type of Object
+			
+		- The Arrays.sort(ARRAYNAME) method sorts an array.
+		- Arrays.binarySearch(ARRAYNAME, VALUE) searches a sorted array and returns the index of a match. 
+		  If no match is found, it negates the position where the element would need to be inserted and subtracts 1.
+		  If you applied Arrays.binarySearch on unsoreted array the result is undefined.
+					String[] sa = { "d", "c", "a", "b" };
+					int x = Arrays.binarySearch(sa, "b"); // x: could be any value
+					Arrays.sort(sa);
+					int y = Arrays.binarySearch(sa, "b"); // y: is always 1
+					System.out.println(x + " " + y);
+
+		Arrays initialization:
+			  int[] java = new int[];  // compile error, you must intialize array with dimension or data
+			  int[][] j = new int[2][];	// OK
+			  int[][] j = new int[][2];	// compile error
+			  int[] dates[] = new int[2][]; // OK
+
+		- Array does not override equals() and so uses object equality, but you can compare two arrays using Arrays utility class. 
+		- ArrayList does override equals() and defines it as the same elements in the same order. 
+
+		- ArrayList implements toString(), so you can easily see the contents just by printing it. 
+		  Arrays do not produce such pretty output by default.
+
+		- Although an ArrayList is not allowed to contain primitives, Java will autobox parameters
+		  passed in to the proper wrapper type.
+		- Collections.sort() sorts an ArrayList.
+
+		- Converting from Array to List 
+			using the method in Arrays utility class "Arrays.asList(ARRAYNAME)"
+				String [] names = {"Tom", "Dick", "Harry"};
+				List<String> list = names.asList(); // Compiler error
+				List<String> list = Arrays.asList(names); // OK
+			
+			OR using => public static <T> List<T> asList(T... a)
+				List<Integer> list = Arrays.asList(10, 4, -1, 5);
+	
+			using "List.of"
+				int[] ints = {1, 2, 3};
+				List<Integer> intList = List.of(ints);
+	
+			Now what are the differences between "Arrays.asList" and "List.of"
+				- Adding elements are not allowed for both of them.
+				- By using "List.of", the created List is immutable so you cannot add or change any element.
+				- By using "Arrays.asList", the created List is mutable so you can change the values of existing elements but you cannot add new one.
+				  by another meaning it creates a fixed size List backed by an array, so any change for any element value in the List will change the value of 
+				  the same element in the array.
+	
+		- Converting from List to Array
+			List.toArray => 
+				public Object[] toArray()
+						List<Integer> al = new ArrayList<Integer>();
+						.
+						.
+						Object[] objects = al.toArray();
+				
+				T[] toArray(T[] a)
+						toArray() method returns an array of type Object(Object[]). 
+						We need to typecast it to Integer before using as Integer objects. 
+						If we do not typecast, we get compilation error.				
+							Integer[] objects = al.toArray(); //error: incompatible types: Object[] cannot be converted to Integer[]
+						
+						It is therefore recommended to create an array into which elements 
+						of List need to be stored and pass it as an argument in toArray() method 
+						to store elements if it is big enough. 
+						Otherwise a new array of the same type is allocated for this purpose.
+							List<Integer> al = new ArrayList<Integer>(); 
+							.
+							.						  
+							Integer[] arr = new Integer[al.size()]; 
+							arr = al.toArray(arr); 
+							
+							OR
+							Integer[] arr = al.toArray(new Integer[al.size()]);
+
+		- Autoboxing
+			4: List<Integer> ages = new ArrayList<>();
+			5: ages.add(Integer.parseInt("5")); // uses autoboxing.
+			6: ages.add(Integer.valueOf("6"));
+			7: ages.add(7); // uses autoboxing.
+			8: ages.add(null);
+
+			Don't forget
+				Integer.valueOf 	=> returns Integer
+				Integer.parseInt 	=> returns int
+
+
+		- compare() and mismatch() methods
+			Which of the following statements are true of the following code? (Choose all that apply.)
+				String[] s1 = { "Camel", "Peacock", "Llama"};
+				String[] s2 = { "Camel", "Llama", "Peacock"};
+				String[] s3 = { "Camel"};
+				String[] s4 = { "Camel", null};
+				A. Arrays.compare(s1, s2) returns a positive integer.
+				B. Arrays.mismatch(s1, s2) returns a positive integer.
+				C. Arrays.compare(s3, s4) returns a positive integer.
+				D. Arrays.mismatch(s3, s4) returns a positive integer.
+				E. Arrays.compare(s4, s4) returns a positive integer.
+				F. Arrays.mismatch(s4, s4) returns a positive integer.
+				
+			The compare() method returns a positive integer when the arrays are different and first array (s1) is
+			larger. 
+				This is the case for option A since the element at index 1 comes first alphabetically. It is not the
+				case for option C because the s4 is longer or option E because the arrays are the same. 
+				
+			The mismatch() method returns a positive integer when the arrays are different in a position index 1 
+			or first array is greater. 
+				This is the case for option B since the difference is at index 1. It is not the case for option D because the s3 is
+				shorter than the s4 or option F because there is no difference.	
+		
+		
+		- Type erasure: 
+			1- Overloading: You cannot overload methods by changing the generic type due to type erasure.
+				Generics
+					You might be surprised to learn that these are not valid overloads:
+						public void walk(List<String> strings) {}
+						public void walk(List<Integer> integers) {} // DOES NOT COMPILE
+					Java has a concept called type erasure where generics are used only at compile time. That means the compiled code
+					looks like this:
+						public void walk(List strings) {}
+						public void walk(List integers) {} // DOES NOT COMPILE
+					We clearly can’t have two methods with the same method signature, so this doesn’t compile. Remember that
+					method overloads must differ in at least one of the method parameters.
+				Arrays
+					Unlike the previous example, this code is just fine:
+						public static void walk(int[] ints) {}
+						public static void walk(Integer[] integers) {}
+					Arrays have been around since the beginning of Java. They specify their actual types and don’t participate in type
+					erasure.
+		
+			2- Overriding: The generic parameter type must match its parent’s type exactly.
+				public class Mammal {
+					public List<CharSequence> play() { ... }
+					public CharSequence sleep() { ... }
+				}
+				public class Monkey extends Mammal {
+					public ArrayList<CharSequence> play() { ... }
+				}
+				public class Goat extends Mammal {
+					public List<String> play() { ... } // DOES NOT COMPILE, List<String> should match exactly the List<CharSequence>
+					public String sleep() { ... } // COMPILE, because String is a subtype of CharSequence
+				}
+				
+	Working with dates and times
+	-----------------------------
+	 - dates are immutable, and have private contructors so they are created using LocalDate.now() or LocalDate.of()
+
+		LocalDate d = new LocalDate(); // DOES NOT COMPILE, because all 3 classes have private contructors
+		LocalDate.of(2015, Month.JANUARY, 32) // throws DateTimeException
+
+		LocalDate date = LocalDate.of(2020, Month.JANUARY, 20);
+		LocalTime time = LocalTime.of(5, 15);
+		LocalDateTime dateTime = LocalDateTime.of(date, time).minusDays(1).minusHours(10).minusSeconds(30);
+
+		LocalDate date = LocalDate.of(2020, Month.JANUARY, 20);
+		date = date.plusMinutes(1); // DOES NOT COMPILE
+
+
+		private static void performAnimalEnrichment(LocalDate start, LocalDate end) {
+		LocalDate upTo = start;
+		while (upTo.isBefore(end)) { // check if still before end
+			System.out.println("give new toy: " + upTo);
+			upTo = upTo.plusMonths(1); // add a month
+		}}
+
+		OR using period
+
+			Period period = Period.ofMonths(1); // create a period
+			performAnimalEnrichment(start, end, period);
+		}
+		private static void performAnimalEnrichment(LocalDate start, LocalDate end,
+		Period period) { // uses the generic period
+			LocalDate upTo = start;
+			while (upTo.isBefore(end)) {
+			System.out.println("give new toy: " + upTo);
+			upTo = upTo.plus(period); // adds the period, notice that Date are immutable as String, 
+									//===> so the return value of all methods such as plus need to be returned in the same object 
+									//	   or another one
+		}}
+
+
+		Examples for creating periods
+			Period annually = Period.ofYears(1); // every 1 year
+			Period quarterly = Period.ofMonths(3); // every 3 months
+			Period everyThreeWeeks = Period.ofWeeks(3); // every 3 weeks
+			Period everyOtherDay = Period.ofDays(2); // every 2 days
+			Period everyYearAndAWeek = Period.of(1, 0, 7); // every year and 7 days
+			
+		===>>> There’s one catch. You cannot chain methods when creating a Period. 
+			   The following code looks like it is equivalent to the everyYearAndAWeek example, but it’s not. 
+			   Only the last method is used because the Period.ofXXX methods are static methods.
+			Period wrong = Period.ofYears(1).ofWeeks(1); // since chaining is not applicable for Period so the last method will be in place 
+													// which is every week
+
+		3: LocalDate date = LocalDate.of(2015, 1, 20);
+		4: LocalTime time = LocalTime.of(6, 15);
+		5: LocalDateTime dateTime = LocalDateTime.of(date, time);
+		6: Period period = Period.ofMonths(1);
+		7: System.out.println(date.plus(period)); // 2015-02-20
+		8: System.out.println(dateTime.plus(period)); // 2015-02-20T06:15
+		9: System.out.println(time.plus(period)); // UnsupportedTemporalTypeException
+
+
+		LocalDate date = LocalDate.of(2020, Month.JANUARY, 20);
+		System.out.println(date.getDayOfWeek()); // MONDAY
+		System.out.println(date.getMonth()); // JANUARY
+		System.out.println(date.getYear()); // 2020
+		System.out.println(date.getDayOfYear()); // 20
+
+
+	Formatting Dates and Times
+	---------------------------
+		date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+		
+		DateTimeFormatter shortDateTime =
+			DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+		System.out.println(shortDateTime.format(dateTime));
+		shortDateTime.format(time)); // UnsupportedTemporalTypeException
+		
+		4: DateTimeFormatter f = DateTimeFormatter.ofPattern("hh:mm");
+		5: f.format(dateTime);
+		6: f.format(date);
+		7: f.format(time);
+		If you get this question on the exam, think about what the symbols represent. We have
+		h for hour and m for minute. Remember M (uppercase) is month and m (lowercase) is minute.
+		We can only use this formatter with objects containing times. Therefore, line 6 will throw
+		an exception.
+
+	
+	Parsing Dates and Times	
+	--------------------------
+		DateTimeFormatter f = DateTimeFormatter.ofPattern("MM dd yyyy");
+		LocalDate date = LocalDate.parse("01 02 2015", f); // System.out.println(date); // 2015-01-02
+		LocalTime time = LocalTime.parse("11:22"); // System.out.println(time); // 11:22
+	
+==========================================================================================================
+==========================================================================================================
+==========================================================================================================
+
+1. What is output by the following code? (Choose all that apply)
+	1: public class Fish {
+	2: 	public static void main(String[] args) {
+	3: 		int numFish = 4;
+	4: 		String fishType = "tuna";
+	5: 		String anotherFish = numFish + 1;
+	6: 		System.out.println(anotherFish + " " + fishType);
+	7: 		System.out.println(numFish + " " + 1);
+	8: } }
+	A. 4 1
+	B. 41
+	C. 5
+	D. 5 tuna
+	E. 5tuna
+	F. 51tuna
+	G. The code does not compile.
+	
+1. G
+------------------------------------------------------------------------------------
+***2. Which of the following are output by this code? (Choose all that apply)
+	3: String s = "Hello";
+	4: String t = new String(s);
+	5: if ("Hello".equals(s)) System.out.println("one");
+	6: if (t == s) System.out.println("two");
+	7: if (t.equals(s)) System.out.println("three");
+	8: if ("Hello" == s) System.out.println("four");
+	9: if ("Hello" == t) System.out.println("five");
+	A. one
+	B. two
+	C. three
+	D. four
+	E. five
+	F. The code does not compile.
+
+2. A, C, D
+------------------------------------------------------------------------------------
+3. Which are true statements? (Choose all that apply)
+	A. An immutable object can be modified.
+	B. An immutable object cannot be modified.
+	C. An immutable object can be garbage collected.
+	D. An immutable object cannot be garbage collected.
+	E. String is immutable.
+	F. StringBuffer is immutable.
+	G. StringBuilder is immutable.
+
+3. B, C, E 
+------------------------------------------------------------------------------------
+4. What is the result of the following code?
+	7: StringBuilder sb = new StringBuilder();
+	8: sb.append("aaa").insert(1, "bb").insert(4, "ccc");
+	9: System.out.println(sb);
+	A. abbaaccc
+	B. abbaccca
+	C. bbaaaccc
+	D. bbaaccca
+	E. An exception is thrown.
+	F. The code does not compile.
+
+012		01234
+aaa		abbaa		abbaccca
+4. B
+------------------------------------------------------------------------------------
+5. What is the result of the following code?
+	2: String s1 = "java";
+	3: StringBuilder s2 = new StringBuilder("java");
+	4: if (s1 == s2)
+	5: 	System.out.print("1");
+	6: if (s1.equals(s2))
+	7: 	System.out.print("2");
+	A. 1
+	B. 2
+	C. 12
+	D. No output is printed.
+	E. An exception is thrown.
+	F. The code does not compile.
+	
+5. F
+------------------------------------------------------------------------------------
+6. What is the result of the following code?
+	public class Lion {
+		public void roar(String roar1, StringBuilder roar2) {
+			roar1.concat("!!!");
+			roar2.append("!!!");
+		}
+		public static void main(String[] args) {
+			String roar1 = "roar";
+			StringBuilder roar2 = new StringBuilder("roar");
+			new Lion().roar(roar1, roar2);
+			System.out.println(roar1 + " " + roar2);
+	} }
+	A. roar roar
+	B. roar roar!!!
+	C. roar!!! roar
+	D. roar!!! roar!!!
+	E. An exception is thrown.
+	F. The code does not compile.	
+	
+6. B
+------------------------------------------------------------------------------------
+7. Which are the results of the following code? (Choose all that apply)
+	String letters = "abcdef";
+	System.out.println(letters.length());
+	System.out.println(letters.charAt(3));
+	System.out.println(letters.charAt(6));
+	A. 5
+	B. 6
+	C. c
+	D. d
+	E. An exception is thrown.
+	F. The code does not compile.
+
+7. B, D, E	
+------------------------------------------------------------------------------------
+8. Which are the results of the following code? (Choose all that apply)
+	String numbers = "012345678";
+	System.out.println(numbers.substring(1, 3));
+	System.out.println(numbers.substring(7, 7));
+	System.out.println(numbers.substring(7));
+	A. 12
+	B. 123
+	C. 7
+	D. 78
+	E. A blank line.
+	F. An exception is thrown.
+	G. The code does not compile.
+	
+8. A, E, D
+------------------------------------------------------------------------------------
+9. What is the result of the following code?
+	3: String s = "purr";
+	4: s.toUpperCase();
+	5: s.trim();
+	6: s.substring(1, 3);
+	7: s += " two";
+	8: System.out.println(s.length());
+	A. 2
+	B. 4
+	C. 8
+	D. 10
+	E. An exception is thrown.
+	F. The code does not compile.
+	
+9. C
+------------------------------------------------------------------------------------
+***10. What is the result of the following code? (Choose all that apply)
+	13: String a = "";
+	14: a += 2;
+	15: a += 'c';
+	16: a += false;
+	17: if ( a == "2cfalse") System.out.println("==");
+	18: if ( a.equals("2cfalse")) System.out.println("equals");
+	A. Compile error on line 14.
+	B. Compile error on line 15.
+	C. Compile error on line 16.
+	D. Compile error on another line.
+	E. ==
+	F. equals
+	G. An exception is thrown.
+	
+10. F
+------------------------------------------------------------------------------------
+11. What is the result of the following code?
+	4: int total = 0;
+	5: StringBuilder letters = new StringBuilder("abcdefg");
+	6: total += letters.substring(1, 2).length();
+	7: total += letters.substring(6, 6).length();
+	8: total += letters.substring(6, 5).length();
+	9: System.out.println(total);
+	A. 1
+	B. 2
+	C. 3
+	D. 7
+	E. An exception is thrown.
+	F. The code does not compile.
+
+11. E
+------------------------------------------------------------------------------------
+12. What is the result of the following code? (Choose all that apply)
+	StringBuilder numbers = new StringBuilder("0123456789");
+	numbers.delete(2, 8);
+	numbers.append("-").insert(2, "+");
+	System.out.println(numbers);
+	A. 01+89–
+	B. 012+9–
+	C. 012+–9
+	D. 0123456789
+	E. An exception is thrown.
+	F. The code does not compile.
+
+0189   0189- 01+89-
+12. A
+------------------------------------------------------------------------------------
+13. What is the result of the following code?
+	StringBuilder b = "rumble";
+	b.append(4).deleteCharAt(3).delete(3, b.length() - 1);
+	System.out.println(b);
+	A. rum
+	B. rum4
+	C. rumb4
+	D. rumble4
+	E. An exception is thrown.
+	F. The code does not compile.
+
+rumble4  	rumle4    delete(3, 5)=> rum4
+13. F (append integer is allowed, but the problem is you cannot assign string to StringBuilder)
+------------------------------------------------------------------------------------	
+14. Which of the following can replace line 4 to print "avaJ"? (Choose all that apply)
+	3: StringBuilder puzzle = new StringBuilder("Java");
+	4: // INSERT CODE HERE
+	5: System.out.println(puzzle);
+	A. puzzle.reverse();
+	B. puzzle.append("vaJ$").substring(0, 4);
+	C. puzzle.append("vaJ$").delete(0, 3).deleteCharAt(puzzle.length() - 1);
+	D. puzzle.append("vaJ$").delete(0, 3).deleteCharAt(puzzle.length());
+	E. None of the above.
+
+append("vaJ$") => JavavaJ$	=> delete(0, 3) => avaJ$ => deleteCharAt(4) => avaJ
+													 => deleteCharAt(5)	
+14. A, C
+------------------------------------------------------------------------------------
+15. Which of these array declarations is not legal? (Choose all that apply)
+	A. int[][] scores = new int[5][];
+	B. Object[][][] cubbies = new Object[3][0][5];
+	C. String beans[] = new beans[6];
+	D. java.util.Date[] dates[] = new java.util.Date[2][];
+	E. int[][] types = new int[];
+	F. int[][] java = new int[][];
+	
+15. C, E, F
+------------------------------------------------------------------------------------
+***16. Which of these compile when replacing line 8? (Choose all that apply)
+	7: char[]c = new char[2];
+	8: // INSERT CODE HERE
+	A. int length = c.capacity;
+	B. int length = c.capacity();
+	C. int length = c.length;
+	D. int length = c.length();
+	E. int length = c.size;
+	F. int length = c.size();
+	G. None of the above.	
+
+16. C
+------------------------------------------------------------------------------------
+17. Which of these compile when replacing line 8? (Choose all that apply)
+	7: ArrayList l = new ArrayList();
+	8: // INSERT CODE HERE
+	A. int length = l.capacity;
+	B. int length = l.capacity();
+	C. int length = l.length;
+	D. int length = l.length();
+	E. int length = l.size;
+	F. int length = l.size();
+	G. None of the above.
+	
+17. F
+------------------------------------------------------------------------------------
+18. Which of the following are true? (Choose all that apply)
+	A. An array has a fixed size.
+	B. An ArrayList has a fixed size.
+	C. An array allows multiple dimensions.
+	D. An array is ordered.
+	E. An ArrayList is ordered.
+	F. An array is immutable.
+	G. An ArrayList is immutable.
+
+18. A, C, *D, *E
+------------------------------------------------------------------------------------
+19. Which of the following are true? (Choose all that apply)
+	A. Two arrays with the same content are equal.
+	B. Two ArrayLists with the same content are equal.
+	C. If you call remove(0) using an empty ArrayList object, it will compile successfully.
+	D. If you call remove(0) using an empty ArrayList object, it will run successfully.
+	E. None of the above.
+	
+19. B, C
+------------------------------------------------------------------------------------
+20. What is the result of the following statements?
+	6: List<String> list = new ArrayList<String>();
+	7: list.add("one");
+	8: list.add("two");
+	9: list.add(7);
+	10: for(String s : list) System.out.print(s);
+	A. onetwo
+	B. onetwo7
+	C. onetwo followed by an exception
+	D. Compiler error on line 9.
+	E. Compiler error on line 10.	
+	
+20. D
+------------------------------------------------------------------------------------
+21. What is the result of the following statements?
+	3: ArrayList<Integer> values = new ArrayList<>();
+	4: values.add(4);
+	5: values.add(5);
+	6: values.set(1, 6);
+	7: values.remove(0);
+	8: for (Integer v : values) System.out.print(v);
+	A. 4
+	B. 5
+	C. 6
+	D. 46
+	E. 45
+	F. An exception is thrown.
+	G. The code does not compile.
+
+21. C
+------------------------------------------------------------------------------------
+***22. What is the result of the following?
+	int[] random = { 6, -4, 12, 0, -10 };
+	int x = 12;
+	int y = Arrays.binarySearch(random, x);
+	System.out.println(y);
+	A. 2
+	B. 4
+	C. 6
+	D. The result is undefined.
+	E. An exception is thrown.
+	F. The code does not compile.
+
+22.	D
+------------------------------------------------------------------------------------
+23. What is the result of the following?
+	4: List<Integer> list = Arrays.asList(10, 4, -1, 5);
+	5: Collections.sort(list);
+	6: Integer array[] = list.toArray(new Integer[4]);
+	7: System.out.println(array[0]);
+	A. –1
+	B. 10
+	C. Compiler error on line 4.
+	D. Compiler error on line 5.
+	E. Compiler error on line 6.
+	F. An exception is thrown.
+	
+23. A
+------------------------------------------------------------------------------------
+***24. What is the result of the following?
+	6: String [] names = {"Tom", "Dick", "Harry"};
+	7: List<String> list = names.asList();
+	8: list.set(0, "Sue");
+	9: System.out.println(names[0]);
+	A. Sue
+	B. Tom
+	C. Compiler error on line 7.
+	D. Compiler error on line 8.
+	E. An exception is thrown.	
+	
+24. C
+------------------------------------------------------------------------------------
+***25. What is the result of the following?
+	List<String> hex = Arrays.asList("30", "8", "3A", "FF");
+	Collections.sort(hex);
+	int x = Collections.binarySearch(hex, "8");
+	int y = Collections.binarySearch(hex, "3A");
+	int z = Collections.binarySearch(hex, "4F");
+	System.out.println(x + " " + y + " " + z);
+	A 0 1 –2
+	B. 0 1 –3
+	C. 2 1 –2
+	D. 2 1 –3
+	E. None of the above.
+	F. The code doesn’t compile.	
+
+after sort => 30, 3A, 8, FF => 2 1 -3
+25. D
+------------------------------------------------------------------------------------
+***26. Which of the following are true statements about the following code? (Choose all that
+apply)
+	4: List<Integer> ages = new ArrayList<>();
+	5: ages.add(Integer.parseInt("5"));
+	6: ages.add(Integer.valueOf("6"));
+	7: ages.add(7);
+	8: ages.add(null);
+	9: for (int age : ages) System.out.print(age);
+	A. The code compiles.
+	B. The code throws a runtime exception.
+	C. Exactly one of the add statements uses autoboxing.
+	D. Exactly two of the add statements use autoboxing.
+	E. Exactly three of the add statements use autoboxing.
+	
+26. A, D 
+A, B, D   (B is correct because the code throws a runtime exception - NullPointerException - at line 9)
+------------------------------------------------------------------------------------
+27. What is the result of the following?
+	List<String> one = new ArrayList<String>();
+	one.add("abc");
+	List<String> two = new ArrayList<>();
+	two.add("abc");
+	if (one == two)
+		System.out.println("A");
+	else if (one.equals(two))
+		System.out.println("B");
+	else
+		System.out.println("C");
+	A. A
+	B. B
+	C. C
+	D. An exception is thrown.
+	E. The code does not compile.	
+	
+27. B
+------------------------------------------------------------------------------------
+***28. Which of the following can be inserted into the blank to create a date of June 21, 2014?
+(Choose all that apply)
+	import java.time.*;
+	public class StartOfSummer {
+		public static void main(String[] args) {
+			LocalDate date = ____________________________
+		}
+	}
+	A. new LocalDate(2014, 5, 21);
+	B. new LocalDate(2014, 6, 21);
+	C. LocalDate.of(2014, 5, 21);
+	D. LocalDate.of(2014, 6, 21);
+	E. LocalDate.of(2014, Calendar.JUNE, 21);
+	F. LocalDate.of(2014, Month.JUNE, 21);
+
+28. C, E
+D, F
+------------------------------------------------------------------------------------
+***29. What is the output of the following code?
+	LocalDate date = LocalDate.parse("2018-04-30", DateTimeFormatter.ISO_LOCAL_DATE);
+	date.plusDays(2);
+	date.plusHours(3);
+	System.out.println(date.getYear() + " " + date.getMonth() + " " + date.getDayOfMonth());
+	A. 2018 APRIL 2
+	B. 2018 APRIL 30
+	C. 2018 MAY 2
+	D. The code does not compile.
+	E. A runtime exception is thrown.
+
+29. E
+D is correct because is a date not datetime
+------------------------------------------------------------------------------------
+***30. What is the output of the following code?
+	LocalDate date = LocalDate.of(2018, Month.APRIL, 40);
+	System.out.println(date.getYear() + " " + date.getMonth() + " "
+		+ date.getDayOfMonth());
+	A. 2018 APRIL 4
+	B. 2018 APRIL 30
+	C. 2018 MAY 10
+	D. Another date.
+	E. The code does not compile.
+	F. A runtime exception is thrown.	
+
+30. F
+------------------------------------------------------------------------------------	
+***31. What is the output of the following code?
+	LocalDate date = LocalDate.of(2018, Month.APRIL, 30);
+	date.plusDays(2);
+	date.plusYears(3);
+	System.out.println(date.getYear() + " " + date.getMonth() + " "
+	+ date.getDayOfMonth());
+	A. 2018 APRIL 2
+	B. 2018 APRIL 30
+	C. 2018 MAY 2
+	D. 2021 APRIL 2
+	E. 2021 APRIL 30
+	F. 2021 MAY 2
+	G. A runtime exception is thrown.
+
+31.	G
+B is correct because dates are immutable class, notice that the plus methods
+have their return values ignored, the result is unchanged.
+------------------------------------------------------------------------------------
+32. What is the output of the following code?
+	LocalDateTime d = LocalDateTime.of(2015, 5, 10, 11, 22, 33);
+	Period p = Period.of(1, 2, 3);
+	d = d.minus(p);
+	DateTimeFormatter f = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
+	System.out.println(d.format(f));
+	A. 3/7/14 11:22 AM
+	B. 5/10/15 11:22 AM
+	C. 3/7/14
+	D. 5/10/15
+	E. 11:22 AM
+	F. The code does not compile.
+	G. A runtime exception is thrown.
+	
+32. E
+------------------------------------------------------------------------------------
+***33. What is the output of the following code?
+	LocalDateTime d = LocalDateTime.of(2015, 5, 10, 11, 22, 33);
+	Period p = Period.ofDays(1).ofYears(2);
+	d = d.minus(p);
+	DateTimeFormatter f = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+	System.out.println(f.format(d));
+	A. 5/9/13 11:22 AM
+	B. 5/10/13 11:22 AM
+	C. 5/9/14
+	D. 5/10/14
+	E. The code does not compile.
+	F. A runtime exception is thrown.	
+	
+2013 5 10 
+33. B
+Period does not allow chaining. Only the last Period method called counts	

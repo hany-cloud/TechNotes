@@ -1,0 +1,597 @@
+Lessons learned
+----------------
+	Notes: 
+		1- The "char" is an unsigned data type, it cannot be assigned a negative value.
+		
+		2- The finalize() method in Object class is marked as protected.
+		
+		
+		3- Be very aware about short-circuit operators in the code, look to the following code:
+			int ph = 7;
+			boolean safe = (3 > 2) && (ph++ > 1);
+			System.out.println(ph);  // prints 7 not 8
+		
+		4- Be very aware about unconditional continue keyword in any loop, it could cause compilation error since the follwoing line(s) of code
+			could be unreachable.
+			
+			for (int b : myFavoriteNumbers) {
+				continue;
+				System.out.print(b + ", "); // Compile error, since this line of code is not reachable	
+			}
+		
+		5- for(var penguin : new int[2])
+				System.out.println(penguin);  // OKAY
+		
+		
+		6- The following code is okay:
+			int b = 1;
+			System.out.println(b=3); // prints 3
+			System.out.println(b+=3); // prints 6
+			System.out.println(++b); // prints 7
+			
+			System.out.println(new StringBuilder("123")); // prints 123, here you don't need to call toString method,
+														  // since it will be called automatically by sysout
+		
+
+
+		7- The for-each loop can be executed on any Collections object that implements java.lang.Iterable,
+		   such as List, Set and Collection interface, but not all Collections classes, such as Map.
+
+		8- The initialization expression (first part - executes only once) & conditional expression (second part) of a for loop is evaluated 
+		   before the first execution of the loop body. While the increment part is evaluated starting from the second execution of the loop body.
+
+
+		9- The compound operator applies casting automatically.	
+					long goat = (int)2;
+					goat -= 1.0; // OK, compound operator applies casting automatically
+
+				While,
+					long goat = 1.0; // compile error
+					
+		10- So, you should know that the following code is okay too:
+			short zebra = (byte) 1.3; // casting will applied so no error with 1.3 and short 
+			
+			While:
+				short zebra = 1.3; // complie error
+		
+		
+	Casting  	Itself is considered an operator. 
+	---------				
+					so for example the operators that can work with boolean are: &, &&, |, ||, !, ^, and Cast with (boolean)
+		
+			long x = (long)(int)(short)2; 	// this is okay and casting to 2 to long at the end
+
+
+			Can we cast byte into short variable and vice versa?  YES, We CAN
+				short a = (byte)2;  // OK 
+				byte b = (short)2;  // OK 
+	
+	Numeric literals Promotion Rules
+	---------------------------------
+		1. If two values have different data types, Java will automatically promote one of the values
+		   to the larger of the two data types.
+		2. If one of the values is integral and the other is floating-point, Java will automatically
+		   promote the integral value to the floating-point value’s data type.
+		3. Smaller data types, namely byte, short, and char, are first promoted to int any time
+		   they’re used with a Java binary arithmetic operator, even if neither of the operands is int.
+		   For example:
+			   byte x = 5;
+			   byte y = 10;
+			   _____ z = x + y; // z will be int
+		   
+		   Note that unary operators are excluded from this rule. 
+		   For example, applying ++ to a short value results in a short value.
+		   
+		4. After all promotion has occurred and the operands have the same data type, the resulting
+		   value will have the same data type as its promoted operands.   
+		
+			The last two rules are the ones most people have trouble with, and the ones likely to trip
+			you up on the exam. For the third rule.
+		
+		Let’s tackle some examples for illustrative purposes:
+		■ What is the data type of x * y?
+		int x = 1;
+		long y = 33;
+		If we follow the first rule, since one of the values is long and the other is int, and long
+		is larger than int, then the int value is promoted to a long, and the resulting value is (long).
+		■ What is the data type of x + y?
+		double x = 39.21;
+		float y = 2.1; // compile error, cannot convert from double to float
+		This is actually a trick question, as this code will not compile! As you may remember
+		from Chapter 1, floating-point literals are assumed to be double, unless postfixed with
+		an f, as in 2.1f. If the value was set properly to (2.1f), then the promotion would be
+		similar to the last example, with both operands being promoted to a double, and the
+		result would be a (double) value.
+		■ What is the data type of x / y?
+		short x = 10;
+		short y = 3;
+		In this case, we must apply the third rule, namely that x and y will both be promoted
+		to int before the operation, resulting in an output of type (int). Pay close attention to
+		the fact that the resulting output is not a short, as we’ll come back to this example in
+		the upcoming section on assignment operators.
+		■ What is the data type of x * y / z?
+		short x = 14;
+		float y = 13;
+		double z = 30;
+		In this case, we must apply all of the rules. First, x will automatically be promoted to
+		int solely because it is a short and it is being used in an arithmetic binary operation.
+		The promoted x value will then be automatically promoted to a float so that it can be
+		multiplied with y. The result of x * y will then be automatically promoted to a double,
+		so that it can be multiplied with z, resulting in a (double) value.
+
+		short x = 10;
+		short y = 3;
+		short z = x * y; // DOES NOT COMPILE
+		short z = (short)(x * y); // OK		
+
+
+	Tricky Notes
+	-------------
+	- Each case statement must have the keyword case in other words,
+	  you cannot chain them with a colon (:) as shown in case 'B' : 'C'
+	  
+	- The switch statement is the only control statement that supports a variety of data types, including String, enum, and in
+	  certain cases var as well as int, byte, char, short.
+		Note: the key of the switch statement and the cases should be of the same type and the cases should be constants
+		
+			char key = 3;
+			final int x = 8;
+			switch (key) {
+				case x:  // Okay, since x is a final primitive variable
+					
+					break;
+
+				default:
+					break;
+			}
+			
+			int key = Integer.valueOf(DayOfWeek.FRIDAY.toString());
+			switch (key) {
+				case FRIDAY:  // compile error, key and the case are of different types 
+					
+					break;
+
+				default:
+					break;
+			}
+		
+		Note: enum canot presented in cases of switch statement, only it's values
+		
+			DayOfWeek key = DayOfWeek.FRIDAY;
+			final DayOfWeek x = DayOfWeek.FRIDAY;
+			switch (key) {
+				case x:  // Complie error
+					
+					break;
+
+				default:
+					break;
+			}
+			
+			DayOfWeek key = DayOfWeek.FRIDAY;
+			final DayOfWeek x = DayOfWeek.FRIDAY;
+			switch (key) {
+				case DayOfWeek.FRIDAY:  // Complie error
+					
+					break;
+
+				default:
+					break;
+			}
+			
+			
+			DayOfWeek key = DayOfWeek.FRIDAY;
+			final DayOfWeek x = DayOfWeek.FRIDAY;
+			switch (key) {
+				case FRIDAY:  // OKAY
+					
+					break;
+
+				default:
+					break;
+			}
+	  
+	- Be wary of questions on the exam that use nested statements, especially ones with labels, and verify
+      they are being used correctly.
+	
+	- Don't forget to check parentheses in the control statements: 
+			while x < 10 // compile error
+	
+	- Don't forget the scope of variables with the control statements:
+		3: do {
+		4: 	int y = 1;
+		5: 	System.out.print(y++ + " ");
+		6: } while(y <= 10); // compile error y is not regocnized
+	
+	- Tricky code 
+			int i = 0;
+			i = i++; // no change for the value of "i" while => i = ++i; is equivalent to ++i
+			System.out.println("i = " + i); // prints 0
+	
+	
+	
+	Bitwise Operators : These operators are used to perform manipulation of individual bits of a number. 
+	-----------------	They can be used with any of the integer types. 
+						They are used when performing update and query operations of Binary indexed tree.
+		&, Bitwise AND operator: returns bit by bit AND of input values.
+		|, Bitwise OR operator: returns bit by bit OR of input values.
+		^, Bitwise XOR operator: returns bit by bit XOR of input values.
+		~, Bitwise Complement Operator: This is a unary operator which returns the one’s compliment representation of the input value, 
+								i.e. with all bits inversed.  
+		
+			// if int a = 010 
+			// Java considers it as octal value 
+			// of 8 as number starts with 0. 
+			int a = 0x0005;  // 0101 => 2^0 + 2^2 => 1 + 4 => 5
+			int b = 0x0007;  // 0111 => 2^0 + 2^1 + 2^2 => 1 + 2 + 4 => 7
+	  
+			// bitwise and 
+			// 0101 & 0111=0101 
+			System.out.println("a&b = " + (a & b)); 
+	  
+			// bitwise and 
+			// 0101 | 0111=0111 
+			System.out.println("a|b = " + (a | b)); 
+	  
+			// bitwise xor 
+			// 0101 ^ 0111=0010 
+			System.out.println("a^b = " + (a ^ b)); 
+	  
+			// bitwise and 
+			// ~0101=1010 
+			System.out.println("~a = " + ~a); 
+	  
+			// can also be combined with 
+			// assignment operator to provide shorthand 
+			// assignment 
+			// a=a&b 
+			a &= b; 
+			System.out.println("a= " + a);
+			
+			Output:
+				a&b = 5
+				a|b = 7
+				a^b = 2
+				~a = -6
+				a= 5
+				
+	Shift Operators : These operators are used to shift the bits of a number left or right thereby multiplying or dividing 
+	---------------   the number by two respectively. 
+					 They can be used when we have to multiply or divide a number by two.
+			<<, Left shift operator: shifts the bits of the number to the left and fills 0 on voids left as a result. 
+			                         Similar effect as of multiplying the number with some power of two.
+			>>, Signed Right shift operator: shifts the bits of the number to the right and fills 0 on voids left as a result. 
+			                        The leftmost bit depends on the sign of initial number. 
+									Similar effect as of dividing the number with some power of two.
+			>>>, Unsigned Right shift operator: shifts the bits of the number to the right and fills 0 on voids left as a result. 
+									The leftmost bit is set to 0.
+
+			
+			int a = 0x0005; // 0000 0101
+			int b = -10; // In Java, negative numbers are stored as 2's complement.
+						 Assume if a = 60 and b = -60; now in binary format, they will be as follows −
+								60         = 0000 0000 0000 0000 0000 0000 0011 1100
+								-60        = 1111 1111 1111 1111 1111 1111 1100 0100
+								-60 >>>  1 = 0111 1111 1111 1111 1111 1111 1110 0010			
+	  
+			// left shift operator 
+			// 0000 0101<<2 =0001 0100(20) 
+			// similar to 5*(2^2) 
+			System.out.println("a<<2 = " + (a << 2)); 
+	  
+			// right shift operator 
+			// 0000 0101 >> 2 =0000 0001(1) 
+			// similar to 5/(2^2) 
+			System.out.println("a>>2 = " + (a >> 2)); 
+	  
+			// unsigned right shift operator 
+			System.out.println("b>>>2 = " + (b >>> 2)); 
+
+			Output:
+				a<<2 = 20
+				a>>2 = 1
+				b>>>2 = 1073741821
+
+
+
+==========================================================================================================				
+==========================================================================================================
+==========================================================================================================
+
+***1. Which of the following Java operators can be used with boolean variables? (Choose all that apply)
+	A. ==
+	B. +
+	C. --
+	D. !
+	E. %
+	F. <=
+	
+1. A, D	
+------------------------------------------------------------------------------------
+***2. What data type (or types) will allow the following code snippet to compile? (Choose all that apply)
+	byte x = 5;
+	byte y = 10;
+	_____ z = x + y;
+	A. int
+	B. long
+	C. boolean
+	D. double
+	E. short
+	F. byte
+	
+2. A, B, D
+------------------------------------------------------------------------------------
+3. What is the output of the following application?
+	1: public class CompareValues {
+	2: 	public static void main(String[] args) {
+	3: 		int x = 0;
+	4: 		while(x++ < 10) {}
+	5: 		String message = x > 10 ? "Greater than" : false;
+	6: 		System.out.println(message+","+x);
+	7: 	}
+	8: }
+	A. Greater than,10
+	B. false,10
+	C. Greater than,11
+	D. false,11
+	E. The code will not compile because of line 4.
+	F. The code will not compile because of line 5.	
+	
+3. F
+------------------------------------------------------------------------------------
+4. What change would allow the following code snippet to compile? (Choose all that apply)
+	3: long x = 10;
+	4: int y = 2 * x;
+	A. No change; it compiles as is.
+	B. Cast x on line 4 to int.
+	C. Change the data type of x on line 3 to short.
+	D. Cast 2 * x on line 4 to int.
+	E. Change the data type of y on line 4 to short.
+	F. Change the data type of y on line 4 to long.	
+	
+4. B, C, D, F
+------------------------------------------------------------------------------------
+5. What is the output of the following code snippet?
+	3: java.util.List<Integer> list = new java.util.ArrayList<Integer>();
+	4: list.add(10);
+	5: list.add(14);
+	6: for(int x : list) {
+	7: 	System.out.print(x + ", ");
+	8: 	break;
+	9: }
+	A. 10, 14,
+	B. 10, 14
+	C. 10,
+	D. The code will not compile because of line 7.
+	E. The code will not compile because of line 8.
+	F. The code contains an infinite loop and does not terminate.  
+
+5. C
+------------------------------------------------------------------------------------
+6. What is the output of the following code snippet?
+	3: int x = 4;
+	4: long y = x * 4 - x++;
+	5: if(y<10) System.out.println("Too Low");
+	6: else System.out.println("Just right");
+	7: else System.out.println("Too High");
+	A. Too Low
+	B. Just Right
+	C. Too High
+	D. Compiles but throws a NullPointerException.
+	E. The code will not compile because of line 6.
+	F. The code will not compile because of line 7.
+
+6. F
+------------------------------------------------------------------------------------
+7. What is the output of the following code?
+	1: public class TernaryTester {
+	2: 	public static void main(String[] args) {
+	3: 		int x = 5;
+	4: 		System.out.println(x > 2 ? x < 4 ? 10 : 8 : 7);
+	5: }}
+	A. 5
+	B. 4
+	C. 10
+	D. 8
+	E. 7
+	F. The code will not compile because of line 4.
+	
+7. D
+------------------------------------------------------------------------------------
+8. What is the output of the following code snippet?
+	3: boolean x = true, z = true;
+	4: int y = 20;
+	5: x = (y != 10) ^ (z=false);
+	6: System.out.println(x+", "+y+", "+z);
+	A. true, 10, true
+	B. true, 20, false
+	C. false, 20, true
+	D. false, 20, false
+	E. false, 20, true
+	F. The code will not compile because of line 5.	
+	
+8. B
+------------------------------------------------------------------------------------
+9. How many times will the following code print "Hello World"?
+	3: for(int i=0; i<10 ; ) {
+	4: 	i = i++;
+	5: 	System.out.println("Hello World");
+	6: }
+	A. 9
+	B. 10
+	C. 11
+	D. The code will not compile because of line 3.
+	E. The code will not compile because of line 5.
+	F. The code contains an infinite loop and does not terminate.	
+
+9. F
+------------------------------------------------------------------------------------
+10. What is the output of the following code?
+	3: byte a = 40, b = 50;
+	4: byte sum = (byte) a + b;
+	5: System.out.println(sum);	
+	A. 40
+	B. 50
+	C. 90
+	D. The code will not compile because of line 4.
+	E. An undefined value.
+
+10. D
+------------------------------------------------------------------------------------
+11. What is the output of the following code?
+	1: public class ArithmeticSample {
+	2: 	public static void main(String[] args) {
+	3: 		int x = 5 * 4 % 3;
+	4: 		System.out.println(x);
+	5: }}
+	A. 2
+	B. 3
+	C. 5
+	D. 6
+	E. The code will not compile because of line 3.	
+	
+11. A
+------------------------------------------------------------------------------------
+12. What is the output of the following code snippet?
+	3: int x = 0;
+	4: String s = null;
+	5: if(x == s) System.out.println("Success");
+	6: else System.out.println("Failure");
+	A. Success
+	B. Failure
+	C. The code will not compile because of line 4.
+	D. The code will not compile because of line 5.	
+	
+12. D
+------------------------------------------------------------------------------------
+13. What is the output of the following code snippet?
+	3: int x1 = 50, x2 = 75;
+	4: boolean b = x1 >= x2;
+	5: if(b = true) System.out.println("Success");
+	6: else System.out.println("Failure");
+	A. Success
+	B. Failure
+	C. The code will not compile because of line 4.
+	D. The code will not compile because of line 5.
+
+13. A
+------------------------------------------------------------------------------------
+14. What is the output of the following code snippet?
+	3: int c = 7;
+	4: int result = 4;
+	5: result += ++c;
+	6: System.out.println(result);
+	A. 8
+	B. 11
+	C. 12
+	D. 15
+	E. 16
+	F. The code will not compile because of line 5.	
+	
+14. C
+------------------------------------------------------------------------------------
+15. What is the output of the following code snippet?
+	3: int x = 1, y = 15;
+	4: while x < 10
+	5: y––;
+	6: x++;
+	7: System.out.println(x+", "+y);
+	A. 10, 5
+	B. 10, 6
+	C. 11, 5
+	D. The code will not compile because of line 3.
+	E. The code will not compile because of line 4.
+	F. The code contains an infinite loop and does not terminate.	
+	
+15. E
+------------------------------------------------------------------------------------	
+***16. What is the output of the following code snippet?
+	3: do {
+	4: 	int y = 1;
+	5: 	System.out.print(y++ + " ");
+	6: } while(y <= 10);
+	A. 1 2 3 4 5 6 7 8 9
+	B. 1 2 3 4 5 6 7 8 9 10
+	C. 1 2 3 4 5 6 7 8 9 10 11
+	D. The code will not compile because of line 6.
+	E. The code contains an infinite loop and does not terminate.
+	
+16. D	
+------------------------------------------------------------------------------------
+17. What is the output of the following code snippet?
+	3: boolean keepGoing = true;
+	4: int result = 15, i = 10;
+	5: do {
+	6: 	i--;
+	7: 	if(i==8) keepGoing = false;
+	8: 	result -= 2;
+	9: } while(keepGoing);
+	10: System.out.println(result);
+	A. 7
+	B. 9
+	C. 10
+	D. 11
+	E. 15
+	F. The code will not compile because of line 8.
+
+17. D	
+------------------------------------------------------------------------------------
+18. What is the output of the following code snippet?
+	3: int count = 0;
+	4: ROW_LOOP: for(int row = 1; row <=3; row++)
+	5: for(int col = 1; col <=2 ; col++) {
+	6: 	if(row * col % 2 == 0) continue ROW_LOOP;
+	7: 	count++;
+	8: }
+	9: System.out.println(count);
+	A. 1
+	B. 2
+	C. 3
+	D. 4
+	E. 6
+	F. The code will not compile because of line 6.
+	
+row 1    col 2   count 1
+    2        1         1
+    3        1         2
+    3        2           	
+18. B   (it's B not A check the description itself it says B at the end)
+------------------------------------------------------------------------------------
+19. What is the result of the following code snippet?
+	3: int m = 9, n = 1, x = 0;
+	4: while(m > n) {
+	5: 	m--;
+	6: 	n += 2;
+	7: 	x += m + n;
+	8: }
+	9: System.out.println(x);
+	A. 11
+	B. 13
+	C. 23
+	D. 36
+	E. 50
+	F. The code will not compile because of line 7.
+	
+m 9   n  1   x 0
+  8      3     11
+  7      5     23
+  6      7     36  
+19. D
+------------------------------------------------------------------------------------
+20. What is the result of the following code snippet?
+	3: final char a = 'A', d = 'D';
+	4: char grade = 'B';
+	5: switch(grade) {
+	6: 	case a:
+	7: 	case 'B': System.out.print("great");
+	8: 	case 'C': System.out.print("good"); break;
+	9: 	case d:
+	10: case 'F': System.out.print("not good");
+	11: }
+	A. great
+	B. greatgood
+	C. The code will not compile because of line 3.
+	D. The code will not compile because of line 6.
+	E. The code will not compile because of lines 6 and 9. 	
+	
+20. B	

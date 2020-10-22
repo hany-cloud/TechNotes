@@ -1,0 +1,627 @@
+Lessons learned
+----------------
+	- Inheriting a class gives you access to all of the public and protected methods of the
+	  class, but special rules for constructors and overriding methods must be followed or the
+	  code will not compile. 
+	  =>>> For example: 
+			As we know if the parent class doesn't include a no-argument constructor or argument constructor(s),
+		    Java compiler will provide one automatically to that class.
+			So what happens if the parent class doesn’t have a no-argument constructor and instead it defines only 
+			argument constructor(s).
+			In this case, the Java compiler will not help and you must create at least
+			one constructor in your child class that explicitly calls a parent constructor via the super()
+			command.
+		   
+		*****Pay close attention on the exam to any class that defines a constructor with arguments
+			 and doesn’t define a no-argument constructor.
+			 
+				public class Mammal {
+					public Mammal(int age) {
+					}
+				}
+			
+			
+				public class Elephant extends Mammal { // DOES NOT COMPILE
+				}
+			OR
+				public class Elephant extends Mammal { 
+					public Elephant() { // DOES NOT COMPILE
+					
+					}
+				}
+
+	- Interface can declare constant static final variables only. 
+	  All members of an interface are assumed to be public.	
+	  Interface does not inherit java.lang.Object.
+      An interface that extends another interface inherits all its abstract methods.
+	  Prior to Java 8 all interface methods would be assumed to be abstract. 
+		Since Java 8 now includes default and static methods and they are never abstract, 
+		you cannot assume the abstract modifier will be implicitly applied to all methods by the compiler.
+		
+		BUT, the follwoing code still works and the compiler will add the abstract as usual
+			interface CanFly {
+				void fly();  // the compiler will add the abstract modifier for the fly method
+				static void play(){}	
+			}
+
+
+	Interface default and static methods
+	---------------------------------------
+		A default method allows a developer to add a new method to an interface used in existing implementations,
+		without forcing other developers using the interface to recompile their code. 
+		A developer using the interface may override the default method or use the provided one.
+
+		Example:
+			interface TestInterface { 
+				// abstract method 
+				public void square(int a); 
+			  
+				// default method 
+				default void showDefault() { 
+				  System.out.println("Default Method Executed"); 
+				}
+
+				// static method 
+				static void showStatic() { 
+					System.out.println("Static Method Executed"); 
+				} 
+			}
+			class TestClass implements TestInterface { 
+				// implementation of square abstract method 
+				public void square(int a) { 
+					System.out.println(a*a); 
+				} 
+			  
+				public static void main(String args[]) { 
+					TestClass d = new TestClass(); 
+					d.square(4); 
+			  
+					// default method executed 
+					d.showDefault(); 
+					
+					// Static method executed 
+					TestInterface.showStatic(); 
+				} 
+			} 
+
+
+			Tricky Notes:
+			--------------
+			interface Animal { public default String getName() { return null; } }
+			interface Mammal { public default String getName() { return null; } }
+			abstract class Otter implements Mammal, Animal {} // Complie Error
+			
+			
+			interface Animal { public default String getName() { return null; } }
+			interface Mammal { public String getName(); }
+			abstract class Otter implements Mammal, Animal {} // Complie Error
+			
+			
+			interface Animal { public String getName(); }
+			interface Mammal { public String getName(); }
+			abstract class Otter implements Mammal, Animal {} // OK
+
+
+			interface Animal { public default String getName() { return null; } }
+			interface Mammal { public default String getName() { return null; } }
+			abstract class Otter implements Mammal, Animal {
+				public String getName() { return null; } // OK
+			}
+			
+			interface Animal { public default String getName() { return null; } }
+			interface Mammal { public default String getName() { return null; } }
+			abstract class Otter implements Mammal, Animal {
+				public abstract String getName(); // OK
+			}
+
+	Understand the rules for method overriding.
+	-------------------------------------------- 
+		The Java compiler allows methods to be overridden in subclasses if certain rules are followed: 
+		1- A method must have the same signature.
+		
+		2- Be at least as accessible as the parent method. 
+		
+		3- Must not declare any new or broader checked exceptions. 
+				=>>> UNCHECKED EXCEPTIONS ARE ALLOWED IN ALL CASES.
+				Checked Exceptions Rules with Method Overriding
+				------------------------------------------------				
+					1) If the superclass method does not declare a checked exception, subclass overridden method cannot 
+					   declare checked exception too.
+					2) If the superclass method declares a checked exception, subclass overridden method can 
+					   declare same subclass exception, more specific(child) exception, or no exception.
+							
+		4- must use covariant return types.
+			// Java program to demonstrate that we can have 
+			// different return types if return type in 
+			// overridden method is sub-type 
+			  
+			// Two classes used for return types. 
+			class A {} 
+			class B extends A {} 
+			  
+			class Base { 
+				A fun() { 
+					System.out.println("Base fun()"); 
+					return new A(); 
+				} 
+			} 
+			  
+			class Derived extends Base { 
+				B fun() { 
+					System.out.println("Derived fun()"); 
+					return new B(); 
+				} 
+			} 
+			  
+			public class Main { 
+				public static void main(String args[]) { 
+				   Base base = new Base(); 
+				   base.fun(); 
+			  
+				   Derived derived = new Derived(); 
+				   derived.fun(); 
+				} 
+			}
+			
+			
+			Output:
+				Base fun()
+				Derived fun()
+
+
+	Understand the rules for hiding methods and variables.
+	--------------------------------------------------------
+		When a static method is recreated in a subclass, it is referred to as method hiding. 
+		Likewise, variable hiding is when a variable name is reused in a subclass.
+		
+		In both situations, the original method or variable still exists and is used in methods 
+		that reference the object in the parent class. 
+		
+		For method hiding, the use of static in the method declaration must be the same between the parent
+		and child class.
+		
+		Finally, variable and method hiding should generally be avoided since it leads to confusing and difficult-to-follow code.
+		
+		In general:
+		 - With hidden methods, the specific method used depends on where it is referenced.
+		 - Private methods by definition are hidden methods.
+		 - Nonprivate methods, both parent and child methods must use static (hide) or neither should use static (override).
+					(The instance method cannot override the static method)
+					
+		 - Variables may only be hidden, regardless of the access modifier. 
+		   Variable hiding happens when we define a variable in a child class with the same name as one we defined in the parent class. 
+
+		 
+
+		Tricky Note:
+		------------
+			1: public abstract class Bird {
+			2: 	private void fly() { System.out.println("Bird is flying"); }
+			3: 	public static void main(String[] args) {
+			4: 		Bird bird = new Pelican();
+			5: 		bird.fly();
+			6: 	}
+			7: }
+			8: class Pelican extends Bird {
+			9: 		protected void fly() { System.out.println("Pelican is flying"); }
+			10: }
+			
+			Output:
+				Bird is flying
+				
+			The trick here is that the method fly() is marked as private in the parent class Bird,
+			which means it may only be hidden, not overridden. With hidden methods, the specific
+			method used depends on where it is referenced. Since it is referenced within the Bird
+			class, the method declared on line 2 was used.	
+
+	Creates and extends abstract classes
+	--------------------------------------
+		- The first concrete subclass of an abstract class must implement all the inherited methods. 
+		- Abstract classes and methods can not be marked as final or private.
+	
+	
+	Valid reference casting 
+	------------------------
+		- An instance can be automatically cast to a superclass or interface reference without an explicit cast.
+					Bird bird = new Pilicon();  ----
+				OR 									|			
+					Cat cat = new Cat();			| 	UPCASTING
+					Animal animal = cat;		----
+					
+		- Alternatively, an explicit cast is required if the reference is being narrowed to a subclass of the object.
+				What if we want to use the variable of type Animal to invoke a method available only to Cat class?
+					Animal animal = new Cat();			
+					((Cat) animal).meow();  		|	DOWNCASTING
+		
+		- The Java compiler doesn’t permit casting to unrelated Class' Object types. 
+				StringBuilder sb = new StringBuilder()
+				String s = (StringBuilder) sb;// compile error
+		
+		You should be able to discern between compiler-time casting errors and those 
+		that will not occur until runtime and that throw a CastClassException.
+		
+		
+		
+	Tricky Notes:
+	-------------
+		public class RopeSwing extends Rope {
+			static void apply() {}  // Complie Error duplicate methods name in the same class
+			void apply() {}
+		}
+		
+		While the follwoing code works
+				package a;
+				public class Rope {		
+					static void apply() {} // Only with private access modifier or default (in case of different packages)
+				}
+				
+				package b;
+				public class RopeSwing extends Rope {
+					void apply() {}
+				}
+			
+			OR you can use hiding method feature
+				public class Rope {		
+					public static void apply() {System.out.println("Rope");} 
+				}
+				
+				public class RopeSwing extends Rope {
+					public static void apply() 
+						{System.out.println("RopeSwing");} // it has to be public or it will give another kind of complie error		
+												           // which is less accees	
+				}
+				
+				And since it's static hidden method, there is no overriding so:
+					Rope rope = new RopeSwing();
+					rope.apply();
+					
+					Output:
+						Rope
+==========================================================================================================
+
+***1. What modifiers are implicitly applied to all interface methods? (Choose all that apply)
+	A. protected
+	B. public
+	C. static
+	D. void
+	E. abstract
+	F. default
+	
+1. B 
+Option E is a tricky one, because prior to Java 8 all interface methods
+would be assumed to be abstract. Since Java 8 now includes default and static
+methods and they are never abstract, you cannot assume the abstract modifier will be
+implicitly applied to all methods by the compiler. 
+------------------------------------------------------------------------------------
+***2. What is the output of the following code?
+	1: class Mammal {
+	2: 	public Mammal(int age) {
+	3: 		System.out.print("Mammal");
+	4: 	}
+	5: }
+	6: public class Platypus extends Mammal {
+	7: 	public Platypus() {
+	8: 		System.out.print("Platypus");
+	9: 	}
+	10: public static void main(String[] args) {
+	11: 	new Mammal(5);
+	12: }
+	13: }
+	A. Platypus
+	B. Mammal
+	C. PlatypusMammal
+	D. MammalPlatypus
+	E. The code will not compile because of line 8.
+	F. The code will not compile because of line 11.
+	
+2. E
+Implicit super constructor MethodReferenceTypes.Mammal() is undefined. Must explicitly invoke another constructor
+Because you don't have a default constructor in Mammal class.
+------------------------------------------------------------------------------------
+***3. Which of the following statements can be inserted in the blank line so that the code will
+	compile successfully? (Choose all that apply)
+	public interface CanHop {}
+	public class Frog implements CanHop {
+		public static void main(String[] args) {
+			________frog = new TurtleFrog();
+		}
+	}
+	public class BrazilianHornedFrog extends Frog {}
+	public class TurtleFrog extends Frog {}
+	A. Frog
+	B. TurtleFrog
+	C. BrazilianHornedFrog
+	D. CanHop
+	E. Object
+	F. Long	
+	
+3. A, B, D, E
+------------------------------------------------------------------------------------
+***4. Which statement(s) are correct about the following code? (Choose all that apply)
+	public class Rodent {
+		protected static Integer chew() throws Exception {
+			System.out.println("Rodent is chewing");
+			return 1;
+		}
+	}
+	public class Beaver extends Rodent {
+		public Number chew() throws RuntimeException {
+			System.out.println("Beaver is chewing on wood");
+			return 2;
+		}
+	}
+	A. It will compile without issue.
+	B. It fails to compile because the type of the exception the method throws is a subclass of
+	   the type of exception the parent method throws.
+	C. It fails to compile because the return types are not covariant.
+	D. It fails to compile because the method is protected in the parent class and public in
+	   the subclass.
+	E. It fails to compile because of a static modifier mismatch between the two methods.
+ 	
+4. C, E
+------------------------------------------------------------------------------------
+***5. Which of the following may only be hidden and not overridden? (Choose all that apply)
+	A. private instance methods
+	B. protected instance methods
+	C. public instance methods
+	D. static methods
+	E. public variables
+	F. private variables
+
+5. A, D, E, F
+------------------------------------------------------------------------------------
+6. Choose the correct statement about the following code:
+	1: interface HasExoskeleton {
+	2: 	abstract int getNumberOfSections();
+	3: }
+	4: abstract class Insect implements HasExoskeleton {
+	5: 	abstract int getNumberOfLegs();
+	6: }
+	7: public class Beetle extends Insect {
+	8: 	int getNumberOfLegs() { return 6; }
+	9: }
+	A. It compiles and runs without issue.
+	B. The code will not compile because of line 2.
+	C. The code will not compile because of line 4.
+	D. The code will not compile because of line 7.
+	E. It compiles but throws an exception at runtime. 
+
+6. D
+------------------------------------------------------------------------------------
+***7. Which of the following statements about polymorphism are true? (Choose all that apply)
+	A. A reference to an object may be cast to a subclass of the object without an explicit cast.
+	B. If a method takes a superclass of three objects, then any of those classes may be passed
+	   as a parameter to the method.
+	C. A method that takes a parameter with type java.lang.Object will take any reference.
+	D. All cast exceptions can be detected at compile-time.
+	E. By defining a public instance method in the superclass, you guarantee that the specific
+	   method will be called in the parent class at runtime.
+
+7. B, C
+A, A reference to an object requires an explicit cast if referenced with a subclass,
+so option A is incorrect. If the cast is to a superclass reference, then an explicit cast is
+not required. Check Q.12
+------------------------------------------------------------------------------------
+***8. Choose the correct statement about the following code:
+	1: public interface Herbivore {
+	2: 	int amount = 10;
+	3: 	public static void eatGrass();
+	4: 	public int chew() {
+	5: 		return 13;
+	6: 	}
+	7: }
+	A. It compiles and runs without issue.
+	B. The code will not compile because of line 2.
+	C. The code will not compile because of line 3.
+	D. The code will not compile because of line 4.
+	E. The code will not compile because of lines 2 and 3.
+	F. The code will not compile because of lines 3 and 4.
+
+8. F
+------------------------------------------------------------------------------------
+9. Choose the correct statement about the following code:
+	1: public interface CanFly {
+	2: 	void fly();
+	3: }
+	4: interface HasWings {
+	5: 	public abstract Object getWindSpan();
+	6: }
+	7: abstract class Falcon implements CanFly, HasWings {
+	8: }
+	A. It compiles without issue.
+	B. The code will not compile because of line 2.
+	C. The code will not compile because of line 4.
+	D. The code will not compile because of line 5.
+	E. The code will not compile because of lines 2 and 5.
+	F. The code will not compile because the class Falcon doesn’t implement the interface
+	   methods.	
+
+9. A
+------------------------------------------------------------------------------------
+***10. Which statements are true for both abstract classes and interfaces? (Choose all that apply)
+	A. All methods within them are assumed to be abstract.
+	B. Both can contain public static final variables.
+	C. Both can be extended using the extends keyword.
+	D. Both can contain default methods.
+	E. Both can contain static methods.
+	F. Neither can be instantiated directly.
+	G. Both inherit java.lang.Object.
+
+10. B, C, E, F 
+------------------------------------------------------------------------------------
+11. What modifiers are assumed for all interface variables? (Choose all that apply)
+	A. public
+	B. protected
+	C. private
+	D. static
+	E. final
+	F. abstract	
+	
+11. A, D, E
+------------------------------------------------------------------------------------	
+***12. What is the output of the following code?
+	1: interface Nocturnal {
+	2: 	default boolean isBlind() { return true; }
+	3: }
+	4: public class Owl implements Nocturnal {
+	5: 	public boolean isBlind() { return false; }
+	6: 	public static void main(String[] args) {
+	7: 		Nocturnal nocturnal = (Nocturnal)new Owl();
+	8: 		System.out.println(nocturnal.isBlind());
+	9: 	}
+	10: }
+	A. true
+	B. false
+	C. The code will not compile because of line 2.
+	D. The code will not compile because of line 5.
+	E. The code will not compile because of line 7.
+	F. The code will not compile because of line 8.
+	
+12. B
+------------------------------------------------------------------------------------	
+13. What is the output of the following code?
+	1: class Arthropod
+	2: 	public void printName(double input) { System.out.print("Arthropod"); }
+	3: }
+	4: public class Spider extends Arthropod {
+	5: 	public void printName(int input) { System.out.print("Spider"); }
+	6: 	public static void main(String[] args) {
+	7: 		Spider spider = new Spider();
+	8: 		spider.printName(4);
+	9: 		spider.printName(9.0);
+	10: }
+	11: }
+	A. SpiderArthropod
+	B. ArthropodSpider
+	C. SpiderSpider
+	D. ArthropodArthropod
+	E. The code will not compile because of line 5.
+	F. The code will not compile because of line 9.
+
+13. A
+------------------------------------------------------------------------------------
+***14. Which statements are true about the following code? (Choose all that apply)
+	1: interface HasVocalCords {
+	2: 	public abstract void makeSound();
+	3: }
+	4: public interface CanBark extends HasVocalCords {
+	5: 	public void bark();
+	6: }
+	A. The CanBark interface doesn’t compile.
+	B. A class that implements HasVocalCords must override the makeSound() method.
+	C. A class that implements CanBark inherits both the makeSound() and bark() methods.
+	D. A class that implements CanBark only inherits the bark() method.
+	E. An interface cannot extend another interface.
+	
+14. C
+B (Option B is incorrect, since an abstract class could implement HasVocalCords 
+	without the need to override the makeSound() method.)
+------------------------------------------------------------------------------------
+***15. Which of the following is true about a concrete subclass? (Choose all that apply)
+	A. A concrete subclass can be declared as abstract.
+	B. A concrete subclass must implement all inherited abstract methods.
+	C. A concrete subclass must implement all methods defined in an inherited interface.
+	D. A concrete subclass cannot be marked as final.
+	E. Abstract methods cannot be overridden by a concrete subclass.
+
+15. B 
+*C (I think it's not correct in case of there is an abstract class in the middle that implements inherited interface methods)
+or some methods in interface are marked as default or static methods.
+------------------------------------------------------------------------------------
+16. What is the output of the following code?
+	1: abstract class Reptile {
+	2: 	public final void layEggs() { System.out.println("Reptile laying eggs");}
+	3: 	public static void main(String[] args) {
+	4: 		Reptile reptile = new Lizard();
+	5: 		reptile.layEggs();
+	6: }
+	7: }
+	8: public class Lizard extends Reptile {
+	9: 	public void layEggs() { System.out.println("Lizard laying eggs"); }
+	10: }
+	A. Reptile laying eggs
+	B. Lizard laying eggs
+	C. The code will not compile because of line 4.
+	D. The code will not compile because of line 5.
+	E. The code will not compile because of line 9.	
+
+16. E	
+------------------------------------------------------------------------------------
+17. What is the output of the following code?
+	1: public abstract class Whale {
+	2: 	public abstract void dive() {};
+	3: 	public static void main(String[] args) {
+	4: 		Whale whale = new Orca();
+	5: 		whale.dive();
+	6: 	}
+	7: }
+	8: class Orca extends Whale {
+	9: 	public void dive(int depth) { System.out.println("Orca diving"); }
+	10: }
+	A. Orca diving
+	B. The code will not compile because of line 2.
+	C. The code will not compile because of line 8.
+	D. The code will not compile because of line 9.
+	E. The output cannot be determined from the code provided.
+	
+17. B	
+------------------------------------------------------------------------------------
+***&&&18. What is the output of the following code? (Choose all that apply)
+	1: interface Aquatic {
+	2: 	public default int getNumberOfGills(int input) { return 2; }
+	3: }
+	4: public class ClownFish implements Aquatic {
+	5: 	public String getNumberOfGills() { return "4"; }
+	6: 	public String getNumberOfGills(int input) { return "6"; }
+	7: 	public static void main(String[] args) {
+	8: 		System.out.println(new ClownFish().getNumberOfGills(-1));
+	9: 	}
+	10: }
+	A. 2
+	B. 4
+	C. 6
+	D. The code will not compile because of line 5.
+	E. The code will not compile because of line 6.
+	F. The code will not compile because of line 8.
+
+18. E
+------------------------------------------------------------------------------------
+***19. Which of the following statements can be inserted in the blank so that the code will
+	compile successfully? (Choose all that apply)
+	public class Snake {}
+	public class Cobra extends Snake {}
+	public class GardenSnake {}
+	public class SnakeHandler {
+		private Snake snake;
+		public void setSnake(Snake snake) { this.snake = snake; }
+		public static void main(String[] args) {
+			new SnakeHandler().setSnake(__________);
+		}
+	}
+	A. new Cobra()
+	B. new GardenSnake()
+	C. new Snake()
+	D. new Object()
+	E. new String("Snake")
+	F. null	
+	
+19. A, C, F
+------------------------------------------------------------------------------------
+***20. What is the result of the following code?
+	1: public abstract class Bird {
+	2: 	private void fly() { System.out.println("Bird is flying"); }
+	3: 	public static void main(String[] args) {
+	4: 		Bird bird = new Pelican();
+	5: 		bird.fly();
+	6: 	}
+	7: }
+	8: class Pelican extends Bird {
+	9: 		protected void fly() { System.out.println("Pelican is flying"); }
+	10: }
+	A. Bird is flying
+	B. Pelican is flying
+	C. The code will not compile because of line 4.
+	D. The code will not compile because of line 5.
+	E. The code will not compile because of line 9. 
+
+20. A 	

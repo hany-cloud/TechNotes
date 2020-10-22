@@ -1,0 +1,526 @@
+Lessons learned
+----------------
+
+	Subclasses of java.lang.Error are exceptions that a programmer should not attempt to handle.
+		You can handle java.lang.Error subclasses, but it’s not a good idea.
+		You can declare any subclass of Error in the throws part of a method declaration.
+	Common errors include:
+	■ ExceptionInInitializerError
+	■ StackOverflowError
+	■ NoClassDefFoundError	 
+
+
+	Differentiate between checked and unchecked exceptions. Unchecked exceptions are also
+	known as runtime exceptions and are subclasses of java.lang.RuntimeException. 
+	All other subclasses of java.lang.Exception are checked exceptions.
+
+	Common runtime exceptions include:
+	■ ArithmeticException
+	■ ArrayIndexOutOfBoundsException
+	■ ClassCastException
+	■ NullPointerException
+	■ ConcurrentModificationException ( if the Collection will be changed while some thread is traversing over it using iterator, the iterator.next() will throw ConcurrentModificationException.)
+	■ IllegalArgumentException (Thrown by JVM, An unexpected parameter is passed into a method, so it can be thrown programatically too)
+	■ NumberFormatException (Thrown by the programmer when an attempt is made to convert a string to a numeric type 
+								but the string doesn't have an appropriate format.)
+
+
+	IllegalArgumentException and NumberFormatException (type of unchecked/runtime exceptions) are commonly thrown by the programmer.
+	While most of the other runtime exceptions are typically thrown by the JVM.
+		 - When says ArithmeticException, ArrayIndexOutOfBoundsException, ClassCastException, NullPointerException 
+		   are thrown by the JVM means those are thrown when there is logical error in programmer's code, 
+		   It is problem at programmer's side.
+
+		 - When says IllegalArgumentException, NumberFormatException 
+		   are thrown by programmer means It is problem or exception generated because of user's invalid input 
+		   that programmer can throw by generating these exception.
+
+
+	Common checked exceptions include:
+	■ IOException
+	■ FileNotFoundException
+
+
+	In try..catch block you cannot catch any checked exception that is can not be thrown from the code inside try block
+		try {
+			System.out.println("work real hard");
+		} catch (IOException e) { // Compile error: Unreachable catch block for IOException. This exception is never thrown from the try statement body
+		} catch (RuntimeException e) {
+		}
+
+
+	Checked Exception Handling with Method Overriding
+	=>>> UNCHECKED EXCEPTIONS ARE ALLOWED IN ALL CASES.
+	1) Rule: If the superclass method does not declare an exception, subclass overridden method cannot declare the checked exception.
+	2) Rule: If the superclass method declares an exception, subclass overridden method can declare same subclass exception, 
+			 more specific exception, or no exception.
+	When a method overrides a method in a superclass or interface, it is not allowed to add
+	checked exceptions. It is allowed to declare fewer exceptions or declare a subclass of a
+	declared exception.	
+	
+	Multiple catch blocks are also allowed, provided no superclass exception type
+	appears in an earlier catch block than its subclass.
+
+	If both catch and finally throw an exception, the one from finally gets thrown.	
+
+
+	Tricky Notes
+	-------------
+	1- Pay attention to the following code:
+		1: public class DoSomething {
+		2: 	public void go() {
+		3: 		System.out.print("A");
+		4: 		try {
+		5: 			stop();
+		6: 		} catch (ArithmeticException e) {
+		7: 			System.out.print("B");
+		8: 		} finally {
+		9: 			System.out.print("C");
+		10: 	}
+		11: 	System.out.print("D");
+		12: }
+		13: public void stop() {
+		14: 	System.out.print("E");
+		15: 	Object x = null;
+		16: 	x.toString();
+		17: 	System.out.print("F");
+		18: }
+		19: public static void main(String[] args) {
+		20: 	new DoSomething().go();
+		21: }
+		22: }
+		
+		Output:
+			AEC is printed besides the stack trace caused by the NullPointerException from line 16
+			
+		As you can notice line 11 will not be executed only the lines inside the finally block will be executed, 
+		unless they don't throw uncaought exception too.
+
+
+	2- Pay attention to the following code:
+		7: public void ohNo() throws IOException {
+		8: 	throw new Exception(); // compile error because a broader exception is not allowed
+		9: }
+	
+		WHILE 
+			public void ohNo() throws IOException {
+				System.out.print("A"); // IS OK
+			}
+			public void ohNo() throws IOException {
+				try {
+					throw new Exception(); // IS OK
+				} catch (Exception e) {}
+			}
+		WHILE
+			public void ohNo() {
+				try {
+					throw new Exception(); // compile error, because it's a checked exception, so you need to throws it in method decalaration  
+										   // Or you have to add explicitly a catch block for that exception 
+				} finally {}
+			}
+
+		That means once you are going to throw any of checked exception from your method body 
+		or calling another method that already throws one of checked exception, you have only two choices to do:
+			1- Add throws declaration, with the same exception or a broader one.
+			2- Surround with try/catch, with the same exception or a broader one.
+
+		So in general we can say 
+			Checked exceptions are required to be handled (By try/catch) or declared(in the throws part of a method declaration). 
+			Runtime exceptions are allowed to be handled or declared. 
+			Errors are allowed to be handled or declared, but this is bad practice.
+			
+
+	VERY IMPORTANT NOTE
+		1- You cannot catch any of the checked exception if the try block doesn't throw that exception or a narrower one of it.
+			Check the follwoing code:
+				try {
+					throw new IOException();
+				} catch (IOException e) {}
+
+				OR
+
+				try {
+					throw new IOException();
+				} catch (Exception e) {}
+		
+		2- Exception base class, is a checked exception.
+==========================================================================================================
+==========================================================================================================
+==========================================================================================================
+
+***1. Which of the following statements are true? (Choose all that apply)
+	A. Runtime exceptions are the same thing as checked exceptions.
+	B. Runtime exceptions are the same thing as unchecked exceptions.
+	C. You can declare only checked exceptions.
+	D. You can declare only unchecked exceptions.
+	E. You can handle only Exception subclasses.
+
+1. B, E (E is wrong answer because you can handle java.lang.Error subclasses, but it’s not a good idea.)
+------------------------------------------------------------------------------------
+2. Which of the following pairs fill in the blanks to make this code compile? (Choose all that
+	apply)
+	7: public void ohNo() _____ Exception {
+	8: _____________ Exception();
+	9: }
+	A. On line 7, fill in throw
+	B. On line 7, fill in throws
+	C. On line 8, fill in throw
+	D. On line 8, fill in throw new
+	E. On line 8, fill in throws
+	F. On line 8, fill in throws new
+	
+2. B, D
+------------------------------------------------------------------------------------
+3. When are you required to use a finally block in a regular try statement (not a try-withresources)?
+	A. Never.
+	B. When the program code doesn’t terminate on its own.
+	C. When there are no catch blocks in a try statement.
+	D. When there is exactly one catch block in a try statement.
+	E. When there are two or more catch blocks in a try statement.	
+	
+3. C
+------------------------------------------------------------------------------------
+&&&4. Which exception will the following throw?
+	Object obj = new Integer(3);
+	String str = (String) obj;
+	System.out.println(str);
+	A. ArrayIndexOutOfBoundsException
+	B. ClassCastException
+	C. IllegalArgumentException
+	D. NumberFormatException
+	E. None of the above.
+	
+4. B
+------------------------------------------------------------------------------------
+***5. Which of the following exceptions are thrown by the JVM? (Choose all that apply)
+	A. ArrayIndexOutOfBoundsException
+	B. ExceptionInInitializerError
+	C. java.io.IOException
+	D. NullPointerException
+	E. NumberFormatException	
+	
+5. A, B, D, E
+5. A, B, D. java.io.IOException is thrown by many methods in the java.io package,
+but it is always thrown programmatically. The same is true for NumberFormatException;
+it is thrown programmatically by the wrapper classes of java.lang. The other
+three exceptions are all thrown by the JVM when the corresponding problem arises.
+------------------------------------------------------------------------------------
+6. What will happen if you add the statement System.out.println(5 / 0); to a working
+	main() method?
+	A. It will not compile.
+	B. It will not run.
+	C. It will run and throw an ArithmeticException.
+	D. It will run and throw an IllegalArgumentException.
+	E. None of the above.
+
+6. C
+------------------------------------------------------------------------------------
+***7. What is printed besides the stack trace caused by the NullPointerException from line 16?
+	1: public class DoSomething {
+	2: 	public void go() {
+	3: 		System.out.print("A");
+	4: 		try {
+	5: 			stop();
+	6: 		} catch (ArithmeticException e) {
+	7: 			System.out.print("B");
+	8: 		} finally {
+	9: 			System.out.print("C");
+	10: 	}
+	11: 	System.out.print("D");
+	12: }
+	13: public void stop() {
+	14: 	System.out.print("E");
+	15: 	Object x = null;
+	16: 	x.toString();
+	17: 	System.out.print("F");
+	18: }
+	19: public static void main(String[] args) {
+	20: 	new DoSomething().go();
+	21: }
+	22: }
+	A. AE
+	B. AEBCD
+	C. AEC
+	D. AECD
+	E. No output appears other than the stack trace. 
+	
+AECD	
+7. D
+C
+"D" will be printed if and only if you have a right exception in the catch clause at line 6 such as:	
+	6: 		} catch (Exception e) {
+		OR
+	6: 		} catch (NullPointerException e) {
+
+------------------------------------------------------------------------------------
+8. What is the output of the following snippet, assuming a and b are both 0?
+	3: try {
+	4: 	return a / b;
+	5: } catch (RuntimeException e) {
+	6: 	return -1;
+	7: } catch (ArithmeticException e) {
+	8: 	return 0;
+	9: } finally {
+	10: System.out.print("done");
+	11: }
+	A. -1
+	B. 0
+	C. done-1
+	D. done0
+	E. The code does not compile.
+	F. An uncaught exception is thrown. 	
+
+8. E
+------------------------------------------------------------------------------------
+9. What is the output of the following program?
+	1: public class Laptop {
+	2: 	public void start() {
+	3: 		try {
+	4: 			System.out.print("Starting up ");
+	5: 			throw new Exception();
+	6: 		} catch (Exception e) {
+	7: 			System.out.print("Problem ");
+	8: 			System.exit(0);
+	9: 		} finally {
+	10: 		System.out.print("Shutting down ");
+	11: 	}
+	12: }
+	13: public static void main(String[] args) {
+	14: 	new Laptop().start();
+	15: } }
+	A. Starting up
+	B. Starting up Problem
+	C. Starting up Problem Shutting down
+	D. Starting up Shutting down
+	E. The code does not compile.
+	F. An uncaught exception is thrown.
+	
+Starting up Problem 
+9. B
+------------------------------------------------------------------------------------
+10. What is the output of the following program?
+	1: public class Dog {
+	2: 	public String name;
+	3: 	public void parseName() {
+	4: 		System.out.print("1");
+	5: 		try {
+	6: 			System.out.print("2");
+	7: 			int x = Integer.parseInt(name);
+	8: 			System.out.print("3");
+	9: 		} catch (NumberFormatException e) {
+	10: 		System.out.print("4");
+	11: 	}
+	12: }
+	13: public static void main(String[] args) {
+	14: 	Dog leroy = new Dog();
+	15: 	leroy.name = "Leroy";
+	16: 	leroy.parseName();
+	17: 	System.out.print("5");
+	18: } }
+	A. 12
+	B. 1234
+	C. 1235
+	D. 124
+	E. 1245
+	F. The code does not compile.
+	G. An uncaught exception is thrown.	
+
+1245
+10. E
+------------------------------------------------------------------------------------
+11. What is the output of the following program?
+	1: public class Cat {
+	2: 	public String name;
+	3: 	public void parseName() {
+	4: 		System.out.print("1");
+	5: 		try {
+	6: 			System.out.print("2");
+	7: 			int x = Integer.parseInt(name);
+	8: 			System.out.print("3");
+	9: 		} catch (NullPointerException e) {
+	10: 		System.out.print("4");
+	11: 	}
+	12: 	System.out.print("5");
+	13: }
+	14: public static void main(String[] args) {
+	15: 	Cat leo = new Cat();
+	16: 	leo.name = "Leo";
+	17: 	leo.parseName();
+	18: 	System.out.print("6");
+	19: }
+	20: }
+	A. 12, followed by a stack trace for a NumberFormatException
+	B. 124, followed by a stack trace for a NumberFormatException
+	C. 12456
+	D. 12456
+	E. 1256, followed by a stack trace for a NumberFormatException
+	F. The code does not compile.
+	G. An uncaught exception is thrown.	
+
+12
+11. A
+------------------------------------------------------------------------------------
+12. What is printed by the following? (Choose all that apply)
+	1: public class Mouse {
+	2: 	public String name;
+	3: 	public void run() {
+	4: 		System.out.print("1");
+	5: 		try {
+	6: 			System.out.print("2");
+	7: 			name.toString();
+	8: 			System.out.print("3");
+	9: 		} catch (NullPointerException e) {
+	10: 		System.out.print("4");
+	11: 		throw e;
+	12: 	}
+	13: 	System.out.print("5");
+	14: }
+	15: public static void main(String[] args) {
+	16: 	Mouse jerry = new Mouse();
+	17: 	jerry.run();
+	18: 	System.out.print("6");
+	19: } }
+	A. 1
+	B. 2
+	C. 3
+	D. 4
+	E. 5
+	F. 6
+	G. The stack trace for a NullPointerException
+
+124	
+12. A, B, D, G
+------------------------------------------------------------------------------------
+***13. Which of the following statements are true? (Choose all that apply)
+	A. You can declare a method with Exception as the return type.
+	B. You can declare any subclass of Error in the throws part of a method declaration.
+	C. You can declare any subclass of Exception in the throws part of a method
+	   declaration.
+	D. You can declare any subclass of Object in the throws part of a method declaration.
+	E. You can declare any subclass of RuntimeException in the throws part of a method
+	   declaration. 
+
+13. A, C, E
+A, B, C, E.
+------------------------------------------------------------------------------------
+***14. Which of the following can be inserted on line 8 to make this code compile? (Choose all
+	that apply)
+	7: public void ohNo() throws IOException {
+	8: 	// INSERT CODE HERE
+	9: }
+	A. System.out.println("it's ok");
+	B. throw new Exception();
+	C. throw new IllegalArgumentException();
+	D. throw new java.io.IOException();
+	E. throw new RuntimeException();
+ 
+14. D
+A, C, D, E. 
+A method that declares an exception isn’t required to throw one, making
+option A correct. Runtime exceptions can be thrown in any method, making options
+C and E correct. Option D matches the exception type declared and so is also correct.
+Option B is incorrect because a broader exception is not allowed.
+------------------------------------------------------------------------------------
+15. Which of the following are unchecked exceptions? (Choose all that apply)
+	A. ArrayIndexOutOfBoundsException
+	B. IllegalArgumentException
+	C. IOException
+	D. NumberFormatException
+	E. Any exception that extends RuntimeException
+	F. Any exception that extends Exception 
+	
+15. A, B, D, E
+------------------------------------------------------------------------------------
+16. Which scenario is the best use of an exception?
+	A. An element is not found when searching a list.
+	B. An unexpected parameter is passed into a method.
+	C. The computer caught fire.
+	D. You want to loop through a list.
+	E. You don’t know how to code a method.
+	
+16. B
+------------------------------------------------------------------------------------
+17. Which of the following can be inserted into Lion to make this code compile? (Choose all
+	that apply)
+	class HasSoreThroatException extends Exception {}
+	class TiredException extends RuntimeException {}
+	interface Roar {
+		void roar() throws HasSoreThroatException;
+	}
+	class Lion implements Roar {// INSERT CODE HERE
+	}
+	A. public void roar(){}
+	B. public void roar() throws Exception{}
+	C. public void roar() throws HasSoreThroatException{}
+	D. public void roar() throws IllegalArgumentException{}
+	E. public void roar() throws TiredException{}
+
+17. A, C, D, E
+------------------------------------------------------------------------------------
+***18. Which of the following are true? (Choose all that apply)
+	A. Checked exceptions are allowed to be handled or declared.
+	B. Checked exceptions are required to be handled or declared.
+	C. Errors are allowed to be handled or declared.
+	D. Errors are required to be handled or declared.
+	E. Runtime exceptions are allowed to be handled or declared.
+	F. Runtime exceptions are required to be handled or declared.
+
+18. B, C, E
+A, B, C, E.  
+Checked exceptions are required to be handled or declared. Runtime
+exceptions are allowed to be handled or declared. Errors are allowed to be handled or
+declared, but this is bad practice.
+------------------------------------------------------------------------------------
+***19. Which of the following can be inserted in the blank to make the code compile? (Choose all
+	that apply)
+	public static void main(String[] args) {
+		try {
+			System.out.println("work real hard");
+		} catch (_____________ e) {
+		} catch (RuntimeException e) {
+		}
+	}
+	A. Exception
+	B. IOException
+	C. IllegalArgumentException
+	D. RuntimeException
+	E. StackOverflowError
+	***F. None of the above. (the e variable is duplicated but it's okay)
+
+19. A, B, C
+C, E. Option C is allowed because it is a more specific type than RuntimeException.
+Option E is allowed because it isn’t in the same inheritance tree as RuntimeException.
+It’s not a good idea to catch either of these. Option B is not allowed because the
+method called inside the try block doesn’t declare an IOException to be thrown. The
+compiler realizes that IOException would be an unreachable catch block. Option D
+is not allowed because the same exception can’t be specified in two different catch
+blocks. Finally, option A is not allowed because it’s more general than RuntimeException
+and would make that block unreachable.
+------------------------------------------------------------------------------------
+***20. What does the output of the following contain? (Choose all that apply)
+	12: public static void main(String[] args) {
+	13: 	System.out.print("a");
+	14: 	try {
+	15: 		System.out.print("b");
+	16: 		throw new IllegalArgumentException();
+	17: 	} catch (IllegalArgumentException e) {
+	18: 		System.out.print("c");
+	19: 		throw new RuntimeException("1");
+	20: 	} catch (RuntimeException e) {
+	21: 		System.out.print("d");
+	22: 		throw new RuntimeException("2");
+	23: 	} finally {
+	24: 		System.out.print("e");
+	25: 		throw new RuntimeException("3");
+	26: 	}
+	27: }
+	A. abce
+	B. abde
+	C. An exception with the message set to "1"
+	D. An exception with the message set to "2"
+	E. An exception with the message set to "3"
+	F. Nothing; the code does not compile.
+
+abce  C E
+20. A, E
+C is not correct because it will be catched by the finally block

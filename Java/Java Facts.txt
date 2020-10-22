@@ -1,0 +1,90 @@
+https://www.baeldung.com/java-8-new-features
+
+Java Facts:
+1 - Valid Java identifiers: may contain only letters, numbers (not as a first letter in the variable name), $, or _.
+		ex. A$B     _helloWorld       $V        Public
+		
+2 - Instance variables intialization
+			strings initialized as null
+			boolean initialized as false
+			
+3 - Numeric literals (numeric variable values) may contain underscores between two digits and begin with 1–9, 0, 0x (hex), 0X (hex), 
+	  0b (binary), or 0B (binary), 0xE, and 1L (long), float f = 1.2f
+	  
+	* 0b, 0B is the prefix for a binary value. 
+		int amount = 0b101; 
+		
+	* 0x, 0X is the prefix for a hexadecimal value. This value can be assigned to many primitive types, including int and
+	  double.
+		int amount = 0xE;
+		bouble amount = 0xE;
+		
+	* double amount = 1_2_.0_0; // incorrect because the underscore is immediately before the decimal.
+	* int amount = 1_2_; // incorrect because the underscore is the very last character.
+			
+	* ouble magic = 9___6; // OK  
+
+4 - You cannot declare static method inside non-static inner class.
+	public class MethodReferenceTypes {
+		class User {
+			static boolean isRealUser(User u) {
+				return true;
+			}
+		}
+	}
+	
+	Compiler error: because User class has to be static
+	
+5 - Pay attention to the following:
+		int i = 0;
+		i = i++;
+		System.out.println(i); // prints 0
+		i = ++i;
+		System.out.println(i); // prints 1
+		
+	
+6 - Two ArrayLists with the same content are equal, while this is not the case in Array.	
+
+7 - * in import statement is useful when doing "import static " to import static members in certain class.
+	Although for me it doesn't mean anything in case of import with no static, but is still works with no compile errors.
+	ANd in this case if you want to use the class that imported with *, you will not be able to use it until you import 
+	the package of this class with * or import the package.classname without * after class name.
+	import java.util.function.Predicate.*;
+	.
+	.
+	.
+	Predicate<User> predicate = u -> User.isRealUser(u); // compile error at this line
+	
+8 - finally block can catch the exception that happen even on the catch blocks
+	12: public static void main(String[] args) {
+	13: 	System.out.print("a");
+	14: 	try {
+	15: 		System.out.print("b");
+	16: 		throw new IllegalArgumentException();
+	17: 	} catch (IllegalArgumentException e) {
+	18: 		System.out.print("c");
+	19: 		throw new RuntimeException("1");
+	20: 	} catch (RuntimeException e) {
+	21: 		System.out.print("d");
+	22: 		throw new RuntimeException("2");
+	23: 	} finally {
+	24: 		System.out.print("e");
+	25: 		throw new RuntimeException("3");
+	26: 	}
+	27: }
+	
+	This code will print abce and an exception with the message set to "3",
+	because the exception with the message set to "1" will bwe catched by finally block
+	
+9 - Arrays.sort
+		If you sorting array that has objects of certain class and this class doesn't implementing the Comparator nor Comparable interfaces,
+		a runtime ClassCastException will be thrown.
+		
+		public class Player {
+		...
+		}
+		Player[] players = new Player[];
+		...
+		Arrays.sort(players); // throw ClassCastException
+		
+		

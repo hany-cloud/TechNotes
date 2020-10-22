@@ -1,0 +1,146 @@
+================================================================================================================================================
+															Functional vs Non Functional Requirements
+															-----------------------------------------
+================================================================================================================================================	
+FUNCTIONAL REQUIREMENTS												NON FUNCTIONAL REQUIREMENTS
+A functional requirement defines a system or its component.			A non-functional requirement defines the quality attribute of a software system.
+
+It specifies “What should the software system do?”					It places constraints on “How should the software system 
+																			fulfill the functional requirements?”
+
+Functional requirement is specified by User.						Non-functional requirement is specified by technical peoples 
+																	e.g. Architect, Technical leaders and software developers.
+																	
+Defined at a component level.										Applied to a system as a whole.
+
+Helps you verify the functionality of the software.					Helps you to verify the performance of the software.
+
+Functional Testing like System, Integration, 						Non-Functional Testing like Performance, Stress, 
+End to End, API testing, etc are done.								Usability, Security testing, etc are done.
+	
+Example for FUNCTIONAL REQUIREMENTS	
+	1) Authentication of user whenever he/she logs into the system.
+	2) A Verification email is sent to user whenever he/she registers for the first time on some software system.
+
+Example for NON FUNCTIONAL REQUIREMENTS
+	1) Emails should be sent with a latency of no greater than 12 hours from such an activity.
+	2) The processing of each request should be done within 10 seconds.
+	3) The web pages should load in 3 seconds when the number of simultaneous users are > 10000 user
+	
+
+================================================================================================================================================
+															Software Testing | Basics
+															--------------------------
+================================================================================================================================================	
+Software testing can be divided into two steps:
+	Verification: “Are we building the product right?”
+	Validation: “Are we building the right product?”
+	
+Software testing types:
+		Manual Testing: the tester takes over the role of an end-user and tests the software to identify any unexpected behavior or bug. 
+						There are different stages for manual testing such as < unit testing, > integration testing, < system testing, > and user acceptance testing.
+						Testers use test plans, test cases, or test scenarios.
+						So it's focusing more over on FUNCTIONAL REQUIREMENTS 
+						
+		Automation Testing: when the tester writes scripts and uses another software to test the product.
+						Automation Testing is used to re-run the test scenarios that were performed manually, quickly, and repeatedly.
+						usually it's used to test the application from load, performance, and stress point of view.
+						So it's focusing more over on Non-Functional REQUIREMENTS.	
+
+Software Testing techniques:
+	BLACK BOX TESTING										WHITE BOX TESTING
+	Internal workings of an application are not required.	Knowledge of the internal workings is must.
+															So Data domains and internal boundaries can be better tested.
+															
+	Done By End users, testers and developers.				Normally done by testers and developers.
+	
+	
+	Gray Box Testing: The tester can access the code for purpose of designing the test cases but he cannot change in the code
+					  like in the white tesing type.
+						
+Software testing levels sorted by execution order:
+	Unit Testing: focuses on smallest unit of software design.
+				  It is often done by programmer by using sample input and observing its corresponding outputs.
+	Integration Testing: is testing in which a group of components are combined for the same module to produce output. 
+						Integration testing considers checking integrated modules in the system.
+	Regression Testing:  is run everytime new module is added to the final product,	
+						 or after every change in the software. 
+		Sanity Testing: Unscripted, Not documented, Narrow and deep, Performed by testers.
+			Normally this test is run when you have a critical bug with high severity in one of the basic module 
+			i.e the password field accepts less than four alpha numeric characters and it should not be below than eight characters.
+		
+		> All these 3 testing levels are done manually and focusing on FUNCTIONAL REQUIREMENTS.		
+	
+	
+	System Testing: In this we have security testing, recovery testing , stress testing (load) and performance testing (speed)
+						Stress testing analyzes the behavior of the system after a failure.
+						Stress testing makes sure that the system recovers after failure.
+						Stress testing It checks whether the system works under the abnormal conditions.
+		
+		> All these different kind of testing under System Testing include functional as well as non functional 
+		  testing and normally it's Automation Testing. 
+	
+	
+	Acceptance Testing: OR called User Acceptance Testing (AUT)
+		Alpha Testing: When software testing is performed internally within	the organization.
+		Beta Testing: The beta test is conducted at one or more customer sites by the end-users.
+
+		> This test level are done manually and focusing on FUNCTIONAL REQUIREMENTS.	
+
+Different Between Unit and Functional/Integration Tests
+--------------------------------------------------------
+Ensuring your application is working properly is a critical part of continuous integration and delivery. 
+Unit tests: help you to test your methods' business logic for both normal & edge cases. 
+
+When it comes to guaranteeing that your users are able to correctly work with your application, we need something different. 
+Functional tests: If your application exposes a frontend with user interaction, we can write functional tests to ensure different use cases are working. 
+				  check the entire application’s functionality with all the code running together, nearly a super Integration test.
+				  How to write Functional Tests for Spring Boot applications using Selenium and Testcontainers???
+
+URL: https://rieckpil.de/spring-boot-functional-tests-with-selenium-and-testcontainers/
+	 https://www.baeldung.com/java-selenium-with-junit-and-testng
+	
+	Functional tests with Selenium and Testcontainers
+		To properly use Selenium to access the frontend of our application and write functional tests, we need a WebDriver. 
+		You can either manually download such a driver for the browser you want to test (e.g. Chrome or Firefox) or use Testcontainers.
+
+		The Testcontainers project provides a module to launch container-based WebDriver to avoid manual effort. 
+		Testcontainers also comes with a JUnit 5 Jupiter module to use JUnit extensions during the tests.
+	
+================================================================================================================================================
+															Software Testing | Automation
+															------------------------------
+================================================================================================================================================
+What is Selenium? Getting started with Selenium Automation Testing
+
+Why Automation is preferable than Manual
+--------------------------------------------
+Suppose there is a login page and we need to verify if all the login attempts are successful, 
+then it will be really easy to write a piece of code which will validate if all the transaction/ login attempts are a success or not (automated test case execution).
+
+Moreover, these tests can be configured in such a way that they are tested in different environments and web browsers. 
+What else can be done? You can automate the generation of result file, by scheduling it for a particular time during the day. 
+Then you can also automate the generation of reports based on those results and what not.
+
+same-origin policy
+-------------------
+Selenium Core was the first tool. But, Selenium Core hit a roadblock in terms of cross-domain testing because of the same-origin policy. 
+The same-origin policy prohibits JavaScript code from accessing web elements that are hosted on a different domain compared to where the JavaScript was launched.
+	
+Selenium WebDriver
+-------------------
+You can run your tests and truly automate cross-browser testing.
+Selenium WebDriver was the first cross-platform testing framework that could control the browser from OS level. 
+Selenium WebDriver provides a programming interface to create and execute test cases. 
+	Test cases are written such that, web elements on web pages are identified 
+	and then actions are performed on those elements.
+	
+	The different WebDrivers are:
+		Firefox Driver (Gecko Driver)
+		Chrome Driver
+		Internet Explorer Driver
+		Opera Driver
+		Safari Driver and
+		HTM Unit Driver
+		
+Maven Tutorial For Selenium Test Automation: https://www.lambdatest.com/blog/getting-started-with-maven-for-selenium-testing/		

@@ -1,0 +1,311 @@
+1. Which of the following Java operators can be used with boolean variables? (Choose all that apply.)
+	A. ==
+	B. +
+	C. --
+	D. !
+	E. %
+	F. <=
+	G. Cast with (boolean)
+
+1. A, D, G
+------------------------------------------------------------------------------------
+2. What data type (or types) will allow the following code snippet to compile? (Choose all that apply.)
+	byte apples = 5;
+	short oranges = 10;
+	_______ bananas = apples + oranges;
+	A. int
+	B. long
+	C. boolean
+	D. double
+	E. short
+	F. byte
+
+2. A, B, D
+------------------------------------------------------------------------------------
+3. What change, when applied independently, would allow the following code snippet to compile? (Choose all
+	that apply.)
+	3: long ear = 10;
+	4: int hearing = 2 * ear;
+	A. No change; it compiles as is.
+	B. Cast ear on line 4 to int.
+	C. Change the data type of ear on line 3 to short.
+	D. Cast 2 * ear on line 4 to int.
+	E. Change the data type of hearing on line 4 to short.
+	F. Change the data type of hearing on line 4 to long.
+
+3. B, C, D, F 
+------------------------------------------------------------------------------------
+4. What is the output of the following code snippet?
+	3: boolean canine = true, wolf = true;
+	4: int teeth = 20;
+	5: canine = (teeth != 10) ^ (wolf=false);
+	6: System.out.println(canine+", "+teeth+", "+wolf);
+	A. true, 20, true
+	B. true, 20, false
+	C. false, 10, true
+	D. false, 20, false
+	E. The code will not compile because of line 5.
+	F. None of the above
+	
+canine = true => true^false => 
+wolf = true => false
+teeth = 20
+	B or D
+4. B
+------------------------------------------------------------------------------------	
+***5. Which of the following operators are ranked in increasing or the same order of precedence? Assume the +
+	operator is binary addition, not the unary form. (Choose all that apply.)
+	A. +, *, %, --
+	B. ++, (int), *
+	C. =, ==, !
+	D. (short), =, !, *
+	E. *, /, %, +, ==
+	F. !, ||, &
+	G. ^, +, =, +=
+	
+5. A, C
+------------------------------------------------------------------------------------	
+***6. What is the output of the following program?
+	1: public class CandyCounter {
+	2: 	static long addCandy(double fruit, float vegetables) {
+	3: 		return (int)fruit+vegetables;
+	4: 	}
+	5:
+	6: 	public static void main(String[] args) {
+	7: 		System.out.print(addCandy(1.4, 2.4f) + "-");
+	8: 		System.out.print(addCandy(1.9, (float)4) + "-");
+	9: 		System.out.print(addCandy((long)(int)(short)2, (float)4)); } }
+	A. 4-6-6.0
+	B. 3-5-6
+	C. 3-6-6
+	D. 4-5-6
+	E. The code does not compile because of line 9.
+	F. None of the above
+	
+6. B
+The code does not compile because of line 3
+6. F. The code does not compile because line 3 contains a compilation error.
+------------------------------------------------------------------------------------	
+***7. What is the output of the following code snippet?
+	int ph = 7, vis = 2;
+	boolean clear = vis > 1 & (vis < 9 || ph < 2);
+	boolean safe = (vis > 2) && (ph++ > 1);
+	boolean tasty = 7 <= --ph;
+	System.out.println(clear+"-"+safe+"-"+tasty);
+	A. true-true-true
+	B. true-true-false
+	C. true-false-true
+	D. true-false-false
+	E. false-true-true
+	F. false-true-false
+	G. false-false-true
+	H. false-false-false
+
+clear => true & (true || false) => true & true => true
+safe  => false && true => false 
+tasty => true
+7. C
+&& is a short-circuit operator, so the ph++ will not be executed
+7. D
+------------------------------------------------------------------------------------
+8. What is the output of the following code snippet?
+	4: int pig = (short)4;
+	5: pig = pig++;
+	6: long goat = (int)2;
+	7: goat -= 1.0;
+	8: System.out.print(pig + " - " + goat);
+	A. 4 - 1
+	B. 4 - 2
+	C. 5 - 1
+	D. 5 - 2
+	E. The code does not compile due to line 7.
+	F. None of the above
+	
+8. A
+------------------------------------------------------------------------------------	
+***9. What are the unique outputs of the following code snippet? (Choose all that apply.)
+	int a = 2, b = 4, c = 2;
+	System.out.println(a > 2 ? --c : b++);
+	System.out.println(b = (a!=c ? a : b++));
+	System.out.println(a > b ? b < c ? b : 2 : 1);
+	A. 1
+	B. 2
+	C. 3
+	D. 4
+	E. 5
+	F. 6
+	G. The code does not compile.
+   	
+9. G
+a => 2 => 2 => 2
+b => 4 => 5 => 5
+c => 2 => 2 => 2
+9. A, D, E	
+------------------------------------------------------------------------------------
+***10. What are the unique outputs of the following code snippet? (Choose all that apply.)
+	short height = 1, weight = 3;
+	short zebra = (byte) weight * (byte) height;
+	double ox = 1 + height * 2 + weight;
+	long giraffe = 1 + 9 % height + 1;
+	System.out.println(zebra);
+	System.out.println(ox);
+	System.out.println(giraffe);
+	A. 1
+	B. 2
+	C. 3
+	D. 4
+	E. 5
+	F. 6
+	G. The code does not compile.
+
+zebra		=> 3
+ox 			=> 6
+giraffe		=> 2	
+10. B, C, F 
+10. G	if we re-write it again like: short zebra = (byte)(weight*height); it will compile 
+------------------------------------------------------------------------------------
+11. What is the output of the following code?
+	1: public class ArithmeticSample {
+	2: 	public static void main(String[] args) {
+	3: 		int sample1 = (2 * 4) % 3;
+	4: 		int sample2 = 3 * 2 % 3;
+	5: 		int sample3 = 5 * (1 % 2);
+	6: 		System.out.println(sample1+"-"+sample2+"-"+sample3);
+	7: }}
+	A. 0-0-5
+	B. 1-2-10
+	C. 2-1-5
+	D. 2-0-5
+	E. 3-1-10
+	F. 3-2-6
+	G. The code does not compile.
+	
+11. D
+------------------------------------------------------------------------------------
+12. The ________ operator increases a value and returns the original value, while the ________ operator
+	decreases a value and returns the new value.
+	A. post-increment, post-increment
+	B. pre-decrement, post-decrement
+	C. post-increment, post-increment
+	D. post-increment, pre-decrement
+	E. pre-increment, pre-decrement
+	F. pre-increment, post-decrement
+	
+12. D
+------------------------------------------------------------------------------------
+13. What is the output of the following code snippet?
+	boolean sunny = true, raining = false, sunday = true;
+	boolean goingToTheStore = sunny & raining ^ sunday;
+	boolean goingToTheZoo = sunday && !raining;
+	boolean stayingHome = !(goingToTheStore && goingToTheZoo);
+	System.out.println(goingToTheStore + "-" + goingToTheZoo
+	+ "-" +stayingHome);
+	A. true-false-false
+	B. false-true-false
+	C. true-true-true
+	D. false-true-true
+	E. false-false-false
+	F. true-true-false
+	G. None of the above
+
+goingToTheStore =>(true & false) ^ true => true
+goingToTheZoo   => true && true => true
+stayingHome     => !(true && true) => false
+13. F
+------------------------------------------------------------------------------------
+14. Which of the following statements are correct? (Choose all that apply.)
+	A. The return value of an assignment operation expression can be void.
+	B. The inequality operator (!=) can be used to compare objects.
+	C. The equality operator (==) can be used to compare a boolean value with a numeric value.
+	D. During runtime, the && and | operators may cause only the left side of the expression to be evaluated.
+	E. The return value of an assignment operation expression is the value of the newly assigned variable.
+	F. In Java, 0 and false may be used interchangeably.
+	G. The logical complement operator (!) cannot be used to flip numeric values.
+	
+14. B, E, G 
+------------------------------------------------------------------------------------	
+15. Which operators take three operands or values? (Choose all that apply.)
+	A. =
+	B. &&
+	C. *=
+	D. ? :
+	E. &
+	F. ++
+	G. /
+
+15. D
+------------------------------------------------------------------------------------
+16. How many lines of the following code contain compiler errors?
+	int note = 1 * 2 + (long)3;
+	short melody = (byte)(double)(note *= 2);
+	double song = melody;
+	float symphony = (float)((song == 1_000f) ? song * 2L : song);
+	A. 0
+	B. 1
+	C. 2
+	D. 3
+	E. 4
+
+16. B	
+------------------------------------------------------------------------------------
+17. Given the following code snippet, what is the value of the variables after it is executed? (Choose all that
+	apply.)
+	int ticketsTaken = 1;
+	int ticketsSold = 3;
+	ticketsSold += 1 + ticketsTaken++;
+	ticketsTaken *= 2;
+	ticketsSold += (long)1;
+	A. ticketsSold is 8
+	B. ticketsTaken is 2
+	C. ticketsSold is 6
+	D. ticketsTaken is 6
+	E. ticketsSold is 7
+	F. ticketsTaken is 4
+	G. The code does not compile.
+
+
+ticketsTaken => 1			   => 2 => 4 => 4
+ticketsSold  => 3 => 1 + 1 + 3 => 5 => 5 => 6
+17. C, F
+------------------------------------------------------------------------------------
+18. Which of the following can be used to change the order of operation in an expression? (Choose all that apply.)
+	A. [ ]
+	B. < >
+	C. ( )
+	D. \ /
+	E. { }
+	F. " "
+
+18. C
+------------------------------------------------------------------------------------
+***19. What is the result of executing the following code snippet? (Choose all that apply.)
+	3: int start = 7;
+	4: int end = 4;
+	5: end += ++start;
+	6: start = (byte)(Byte.MAX_VALUE + 1);
+	A. start is 0
+	B. start is -128
+	C. start is 127
+	D. end is 8
+	E. end is 11
+	F. end is 12
+	G. The code does not compile.
+	H. The code compiles but throws an exception at runtime. 
+
+19. F, H
+19. B, F. On line 6, we are incrementing one past the maximum byte value. Due to overflow, this will result in a negative 
+number, making option B the correct answer. 
+Even if you didn’t know the maximum value of byte, you should have known the code compiles and runs and looked 
+for the answer for start with a negative number.
+------------------------------------------------------------------------------------
+20. Which of the following statements about unary operators are true? (Choose all that apply.)
+	A. Unary operators are always executed before any surrounding binary or ternary operators.
+	B. The - operator can be used to flip a boolean value.
+	C. The pre-increment operator (++) returns the value of the variable before the increment is applied.
+	D. The post-decrement operator (--) returns the value of the variable before the decrement is applied.
+	E. The ! operator cannot be used on numeric values.
+	F. None of the above
+	
+20. A, D, E	
+	
+

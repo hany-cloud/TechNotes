@@ -1,0 +1,731 @@
+Introduction
+----------------
+	What is OGNL???
+	The ${...} expressions are in fact OGNL (Object-Graph Navigation Language) expressions 
+	executed on the map of variables contained in the context.
+
+Integrating Thymeleaf with Spring
+----------------------------------
+Thymeleaf offers a set of Spring integrations that allow you to use it as a fully-featured substitute for JSP in Spring MVC applications.
+
+These integrations will allow you to:
+
+- Make the mapped methods in your Spring MVC @Controller objects forward to templates managed by Thymeleaf, exactly like you do with JSPs.
+- Use Spring Expression Language (Spring EL) instead of OGNL in your templates.
+- Create forms in your templates that are completely integrated with your form-backing beans and result bindings, 
+  including the use of property editors, conversion services and validation error handling.
+- Display internationalization messages from message files managed by Spring (through the usual MessageSource objects).
+- Resolve your templates using Spring’s own resource resolution mechanisms.
+
+================================================================================================================================================		
+================================================================================================================================================		
+													Thymeleaf  	
+================================================================================================================================================
+================================================================================================================================================
+Thymeleaf essentials in points
+-------------------------------
+1. Standard Expression syntax
+	${...} : Variable expressions.		=> executed on the whole context variables map.				
+				i.e. <span th:text="${book.author.name}">   OR    <li th:each="book : ${books}">
+				
+				So ${person.father.name} is equivilant to ${person['father']['name']} same as in Javascript
+				
+				/*
+				 * If the object is a map (key, value), both dot and bracket syntax will be equivalent to 
+				 * executing a call on its get(...) method.
+				 */
+				${countriesByCode.ES}
+				${personsByName['Stephen Zucchini'].age}
+				/*
+				 * Indexed access to arrays or collections is also performed with brackets, 
+				 * writing the index without quotes.
+				 */
+				${personsArray[0].name}
+				/*
+				 * Methods can be called, even with arguments.
+				 */
+				${person.createCompleteName()}
+				${person.createCompleteNameWithSeparator('-')}
+				
+	*{...} : Selection expressions.		=> executed on a previously selected object instead of the whole context variables map.		
+				i.e <div th:object="${book}"> ... 
+						Label/Text: <span th:text="*{title}">...</span> ... </div>
+						
+						input:		<input type="text" th:field="*{bookName}"/>
+								The th:field attribute behaves differently depending on whether it is attached to an <input>, <select> or <textarea> tag 
+								(and also depending on the specific type of <input> tag). In this case (input[type=text]), 
+								the above line of code is similar to:
+									<input type="text" id="bookName" name="bookName" th:value="*{bookName}" />
+									
+						radio: 		<input type="radio" th:value="${gender}" th:field="*{gender}"/>	
+									<label th:for="${#ids.prev('gender')}" th:text="${gender.description}">Male</label>
+							
+							
+	#{...} : Message (i18n) expressions.
+				i.e <th th:text="#{header.address.city}">...</th>   OR  #{${config.adminWelcomeKey}(${session.user.name})}
+				
+				Unescaped Text
+					what if we had a message like this
+						home.welcome=Welcome to our <b>fantastic</b> grocery store!
+					If we execute this template like before <p th:text="#{home.welcome}">Welcome to our grocery store!</p> 
+					we will obtain:
+						<p>Welcome to our &lt;b&gt;fantastic&lt;/b&gt; grocery store!</p>
+					If we want Thymeleaf to respect our XHTML tags <p th:utext="#{home.welcome}">Welcome to our grocery store!</p>	
+				
+				Parametrized messages
+					home.welcome=Welcome to our grocery store, {0}!
+					<p th:utext="#{home.welcome(${session.user.name})}">
+					  Welcome to our grocery store, Sebastian Pepper!
+					</p>
+					
+					OR
+					
+					<p th:utext="#{${welcomeMsgKey}(${session.user.name})}">
+					  Welcome to our grocery store, Sebastian Pepper!
+					</p>
+		
+		
+	@{...} : Link (URL) expressions. 	=> Thymeleaf will always call the HttpServletResponse.encodeUrl(...) mechanism before displaying the URL. 
+										   Which means that a filter can perform customized URL-rewriting 
+										   for the application by means of wrapping the HttpServletResponse object.
+										   
+				For a web application deployed at the /myapp context of your web server
+					i.e 
+						> Building link URL
+						<a th:href="@{/order/list}">...</a>  
+						 
+						> Building link URL with Request parameters
+						<a th:href="@{/order/details(id=${orderId},type=${orderType})}">...</a>  => <a href="/myapp/order/details?id=23&amp;type=online">...</a>
+					
+						> Use the path variable syntax to build a URL	
+							So assume there are two beans, productId and productName have been set into the context.
+							Use the path variable syntax to build a URL containing this parameters in the form of: 
+							http://itutorial.thymeleaf.org/buy/273/Red-carpet.html
+							
+							<a href="buy.html"
+								   th:href="@{/buy/{id}/{name}.html(id=${productId}, name=${productName})}">Buy now!</a>
+			   
+			   
+	~{...}, th:fragment : Fragment expressions. => We will often want to include in our templates fragments from other templates. 
+													Common uses for this are footers, headers, menus.
+													There are two main styles of organizing layouts in projects: include style and hierarchical style.
+													We will cover the include style only in this part.
+													But hierarchical style can be done using "Thymeleaf Layout Dialect".
+													
+				declaring Fragment in footer page called copy, so "footer" is our templatename and copy is our Fragment
+					<body><div th:fragment="copy">&copy; 2011 The Good Thymes Virtual Grocery</div></body>					   
+				then in somewehere else we will include only the fragment called copy in the footer template
+					<body> ... <div th:include="footer :: copy"></div>  .... </body>
+					
+				So, There are three different formats: 
+					"templatename::domselector"  			=> Includes the fragment resulting from executing the specified DOM Selector on the template
+					"templatename"  						=> Includes the complete template
+					::domselector" or "this::domselector"	=> Includes a fragment from the same template.
+				
+				Both templatename and domselector in the above examples can be fully-featured expressions (even conditionals!) like:
+						<div th:include="footer :: (${user.isAdmin}? #{footer.admin} : #{footer.normaluser})"></div>
+					#{footer.admin} and #{footer.normaluser} are a Message (i18n) expressions
+
+				DOM Selector (domselector) syntax is similar to CSS selectors
+				So we can use this feature to referencing fragments without th:fragment like:
+
+					<div id="copy-section">&copy; 2011 The Good Thymes Virtual Grocery</div>
+				then in somewehere else, use the fragment above simply referencing it by its id attribute	
+					<div th:include="footer :: #copy-section"></div>
+	
+		
+				Difference between th:include and th:replace
+					from template: <footer th:fragment="copy">&copy; 2011 The Good Thymes Virtual Grocery</footer>
+					
+					<div th:include="footer :: copy"></div>
+					<div th:replace="footer :: copy"></div>
+		
+					results
+					  <div>&copy; 2011 The Good Thymes Virtual Grocery</div>
+					  <footer>&copy; 2011 The Good Thymes Virtual Grocery</footer>
+
+				Parameterizable fragment
+					<div th:fragment="display (onevar,twovar)">
+						<p th:text="${onevar} + ' - ' + ${twovar}">...</p>
+					</div>
+					
+					<div th:include="::display (${value1},${value2})">...</div>
+					<div th:include="::display (onevar=${value1},twovar=${value2})">...</div>
+					<div th:include="::display (twovar=${value2},onevar=${value1})">...</div>
+					
+					Fragment local variables without fragment signature
+						<div th:fragment="frag">...</div>
+						
+						<div th:include="::frag (onevar=${value1},twovar=${value2})">
+						it's equivalent to
+						<div th:include="::frag" th:with="onevar=${value1},twovar=${value2}">
+						
+					th:assert for in-template assertions
+						<div th:assert="${onevar},(${twovar} != 43)" th:fragment="display (onevar,twovar)">...</div>
+						OR 
+						<header th:fragment="contentheader(title)" th:assert="${!#strings.isEmpty(title)}">...</header>
+
+		Note: please return to the follwoing URL https://www.thymeleaf.org/doc/articles/layouts.html for more details about fragment 
+			  types, usage and the integration between fragments and AJAX as well as fragments and Spring security.
+
+2. Removing parts at runtime => th:remove="all-but-first"
+	all: Remove both the containing tag and all its children.
+	body: Do not remove the containing tag, but remove all its children.
+	tag: Remove the containing tag, but do not remove its children.
+	all-but-first: Remove all children of the containing tag except the first one.
+	none : Do nothing. This value is useful for dynamic evaluation.	
+
+	So we can use all-but-first value when prototyping:
+	<table>
+	  <thead>
+		<tr>
+		  <th>Index</th>	
+		  <th>NAME</th>
+		  <th>PRICE</th>
+		  <th>IN STOCK</th>
+		  <th>COMMENTS</th>
+		</tr>
+	  </thead>
+	  <tbody th:remove="all-but-first">
+		<tr th:each="prod : ${prods}" th:class="${prodStat.odd}? 'odd'">
+		  <td th:text="${prodStat.count}">XXX</td>
+		  <td th:text="${prod.name}">Onions</td>
+		  <td th:text="${prod.price}">2.41</td>
+		  <td th:text="${prod.inStock}? #{true} : #{false}">yes</td>
+		  <td>
+			<span th:text="${#lists.size(prod.comments)}">2</span> comment/s
+			<a href="comments.html" 
+			   th:href="@{/product/comments(prodId=${prod.id})}" 
+			   th:unless="${#lists.isEmpty(prod.comments)}">view</a>
+		  </td>
+		</tr>
+		<tr class="odd">
+		  <td>Blue Lettuce</td>
+		  <td>9.55</td>
+		  <td>no</td>
+		  <td>
+			<span>0</span> comment/s
+		  </td>
+		</tr>
+		<tr>
+		  <td>Mild Cinnamon</td>
+		  <td>1.99</td>
+		  <td>yes</td>
+		  <td>
+			<span>3</span> comment/s
+			<a href="comments.html">view</a>
+		  </td>
+		</tr>
+	  </tbody>
+	</table>
+		
+	The th:remove attribute can take any Thymeleaf Standard Expression
+		<a href="/something" th:remove="${condition}? tag : none">Link text not to be removed</a>
+		it's equivalent to
+		<a href="/something" th:remove="${condition}? tag">Link text not to be removed</a>
+		
+		
+3. data-th-* can be used instead of th:*
+	i.e. th:each  								 => data-th-each
+		 <tr th:each="product : ${productList}"> => <tr data-th-each="product : ${productList}">
+
+
+4. Expression Basic Objects: When evaluating OGNL expressions on the context variables, 
+							some objects are made available to expressions for higher flexibility. 
+							These objects will be referenced (per OGNL standard) starting with the # symbol:
+			
+						#ctx: the context object.
+						#vars: the context variables.
+						#locale: the context locale.
+						#httpServletRequest: (only in Web Contexts) the HttpServletRequest object.
+						#httpSession: (only in Web Contexts) the HttpSession object.
+	
+	Expression Utility Objects: Besides these basic objects, Thymeleaf will offer us a set of utility objects 
+								that will help us perform common tasks in our expressions:
+								
+						#dates: utility methods for java.util.Date objects: formatting, component extraction, etc.
+						#calendars: analogous to #dates, but for java.util.Calendar objects.
+						#numbers: utility methods for formatting numeric objects.
+						#strings: utility methods for String objects: contains, startsWith, prepending/appending, etc.
+						#objects: utility methods for objects in general.
+						#bools: utility methods for boolean evaluation.
+						#arrays: utility methods for arrays.
+						#lists: utility methods for lists.
+						#sets: utility methods for sets.
+						#maps: utility methods for maps.
+						#aggregates: utility methods for creating aggregates on arrays or collections.
+						#messages: utility methods for obtaining externalized messages inside variables expressions, in the same way as they would be obtained using #{…} syntax.
+						#ids: utility methods for dealing with id attributes that might be repeated (for example, as a result of an iteration).		
+
+					i.e.
+						#lists.isEmpty(...) function
+						#ids.prev(...) OR #ids.next(...) function
+	
+					Formatting Numbers and Dates
+						<dd th:text="${'$' + #numbers.formatDecimal(product.price, 1, 2)}">$850.00</dd>
+						<dd th:text="${#dates.format(product.availableFrom, 'dd-MMM-yyyy')}">28-Jun-2013</dd>	
+						
+	So let see by diffecult example the power of the above mentioned basic and utilitiy objects' methods.
+	Assume we have the following lines in our Messages_en.properties file: 
+	
+		seedstarter.feature.SEEDSTARTER_SPECIFIC_SUBSTRATE=Seedstarter Specific Substrate
+		seedstarter.feature.FERTILIZER=Fertilizer
+		seedstarter.feature.PH_CORRECTOR=Corrector of PH
+		
+	And we want to display all the features of our container that come in the form of an array of Feature enums, 
+	separated by commas. Like “Electric Heating, Turf”. 
+	
+	For achieving this, we can use the following code:
+
+			<td th:text="${#strings.arrayJoin(
+							   #messages.arrayMsg(
+								   #strings.arrayPrepend(sb.features,'seedstarter.feature.')),
+							   ', ')}">Electric Heating, Turf</td>
+
+================================================================================================================================================
+Thymeleaf In Action (Some Code Samples)
+-------------------------------------------------
+1- http://itutorial.thymeleaf.org/exercise/9
+		<table>
+            <thead>
+                <tr>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Gender</th>
+                    <th>Payment method</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody th:remove="all-but-first">
+                <tr th:each="customer : ${customerList}">
+                    <td th:text="${customer.firstName}">Peter</td>
+                    <td th:text="${customer.lastName}">Jackson</td>
+                    <!-- 
+                       Use th:switch for selecting content based on ${customer.gender}.
+                       As genre can be null if unknown, better use ${customer.gender?.name()}
+                       for obtaining its name.
+                    -->
+                    <td th:switch="${customer.gender?.name()}">
+                        <img th:case="'MALE'" alt="Male" src="/images/male.png"/>
+                        <img th:case="'FEMALE'" alt="Female" src="/images/female.png"/> 
+                        <span th:case="*">Unknown</span>
+                    </td>
+                    <td>
+                        <span th:text="${customer.paymentMethod.description}">Direct debit</span>
+                        <!-- Show next message only when paymentMethod is CREDIT_CARD -->
+                        <span class="warn" th:if="${customer.paymentMethod?.name() == 'CREDIT_CARD'}">
+                            Payment must be done in the next 4 days
+                        </span>
+                    </td>
+                    <!-- Add class="enhanced" when balance is greater than 10000 -->
+                    <td th:text="${customer.balance}" th:class="${customer.balance > 10000 ? 'enhanced' : ''}">35</td>
+                    <!-- OR <td th:text="${customer.balance}" th:class="${customer.balance gt 10000} ? 'enhanced'">305</td> -->
+                </tr>
+                <tr>
+                    <td>Hany</td>
+                    <td>Houston</td>
+                    <td>
+                        <img alt="Male" src="/images/male.png" />
+                    </td>
+                    <td>
+                        <span>Credit card payment</span>
+                        <!-- Show next message only when paymentMethod is not CREDIT_CARD -->
+                        
+                    </td>
+                    <td class="enhanced">3000</td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+
+2- http://itutorial.thymeleaf.org/exercise/10
+
+		<h1>Thymeleaf tutorial - Answer for exercise 10: Spring Expression language</h1>
+  
+        <h2>Arithmetic expressions</h2>
+        <p class="label">Four multiplied by minus six multiplied by minus two module seven:</p>
+        <p class="answer" th:text="${(4 * -6 * -2) % 7}">123</p>
+ 
+        <h2>Object navigation</h2>
+        <p class="label">Description field of paymentMethod field of the third element of customerList bean:</p>
+        <p class="answer" th:text="${customerList.get(2).paymentMethod.description}">Credit card</p>
+ 
+        <h2>Object instantiation</h2>
+        <p class="label">Current time milliseconds:</p>
+        <!--<p class="answer" th:text="${T(java.time.LocalTime).now()}">22-Jun-2013</p>-->
+        <p class="answer" th:text="${new java.util.Date().getTime()}">22-Jun-2013</p>
+        
+        <h2>T operator</h2>
+        <p class="label">Random number:</p>
+        <p class="answer" th:text="${T(java.lang.Math).random()}">123456</p>
+		
+
+3- http://itutorial.thymeleaf.org/exercise/11
+
+		<h1>Thymeleaf tutorial - Solution for exercise 11: links</h1>
+		<!-- 
+			Modify the two links in order to point to /exercise11/product.html URL with the request parameter action. 
+			The value for action parameter must be view for the first link and edit for the second.
+		-->
+		<h2>Product actions</h2>
+		<ul>
+			<li><a href="#" th:href="@{/exercise11/product.html(action='view')}">View product</a></li>
+			<li><a href="#" th:href="@{/exercise11/product.html(action='edit')}">Edit product</a></li>
+		</ul>
+		
+		
+4- http://itutorial.thymeleaf.org/exercise/12	
+		Using th:object, and th:field
+		
+		<!-- 
+            Set the action attribute to "/exercise12/saveCustomer.html", and use
+            th:object to bind the ${customer} variable as the form-backing bean. 
+        -->
+		<form action="saveCustomer.html" th:action="@{/exercise12/saveCustomer.html}" th:object="${customer}" method="post">
+            
+			<!-- Use th:field to set field 'id' here 
+                To generate
+                <input type="hidden" id="id" name="id" value="1085" />
+            -->
+			<input type="hidden" th:field="*{id}" />
+            
+            <label for="firstName">First name:</label>
+            <input type="text" th:field="*{firstName}" value="John" />
+            
+            <label for="lastName">Last name:</label>
+            <input type="text" th:field="*{lastName}" value="Wayne" />
+            
+            Genre:
+			<!-- Iterate on ${genders} -->
+            <div th:each="gender : ${genders}" class="radio">
+				<!-- Use th:field to check *{gender} 
+                    To generate 
+                    <input type="radio" value="FEMALE" id="gender1" name="gender" />
+                    <label for="gender1">Female gender</label>
+                -->
+                <input type="radio" th:value="${gender}" th:field="*{gender}" />
+                <label th:for="${#ids.prev('gender')}" th:text="${gender.description}">Male</label>
+            </div>
+            <div th:remove="all" class="radio">
+                <input type="radio" />
+                <label>Female</label>
+            </div>
+            
+            <label for="paymentMethod">Payment method:</label>
+            <select th:field="*{paymentMethod}" th:remove="all-but-first">
+				<!-- Iterate on ${paymentMethods} -->
+                <option th:each="paymentMethod : ${paymentMethods}"
+                        th:value="${paymentMethod}" 
+						th:text="${paymentMethod.description}">Credit card</option>
+                <option>Another payment method</option>
+                <option>Another payment method</option>
+            </select>
+            
+            <label for="balance">Balance (dollars):</label>
+            <input type="text" th:field="*{balance}" size="10" value="2500" />
+            
+            <input type="submit" />
+        </form>
+		
+5- 	http://itutorial.thymeleaf.org/exercise/13
+		Using Thymeleaf's text inlining.
+		
+		<textarea id="body" name="body" th:inline="text">
+			Dear [[${customerName}]],
+
+			it is our sincere pleasure to congratulate your in your birthday:
+				Happy birthday [[${customerName}]]!!!
+
+			See you soon, [[${customerName}]].
+
+			Regards,
+				The Thymeleaf team
+		</textarea>
+		
+	 same-template fragments	
+6- 	http://itutorial.thymeleaf.org/exercise/14
+
+		<head>
+			<title>Thymeleaf tutorial: exercise 14</title>
+			<link rel="stylesheet" href="../../../css/main-static.css" th:href="@{/css/main.css}" />
+			<meta charset="utf-8" />
+		</head>
+		<body>
+			<h1>Thymeleaf tutorial - Answer for exercise 14: same-template fragments</h1>
+			<div id="bannerElement" th:fragment="bannerElem">
+				<div class="banner">
+					<img alt="Thymeleaf logo" src="../../../images/logo.png" th:src="@{/images/logo.png}" />
+					<span th:text="${'The Thymeleaf tutorial'}">The Thymeleaf tutorial - static</span>
+				</div>
+			</div>
+			<h2>Product information</h2>
+			<dl>
+				<dt>Product name</dt>
+				<dd th:text="${product.description}">Red chair</dd>
+
+				<dt>Product price</dt>
+				<dd th:text="${product.price}">350</dd>
+
+				<dt>Product available from</dt>
+				<dd th:text="${product.availableFrom}">28-Jun-2013</dd>
+			</dl>
+			<!-- Include the banner here: using its fragment name 
+				<div th:include="this :: bannerElem">Banner</div>
+			-->
+			<div th:include="::bannerElem">
+				<div class="banner">
+					<img alt="Thymeleaf logo" src="../../../images/logo.png"/>
+					<span>The Thymeleaf tutorial - static</span>
+				</div>
+			</div>
+			<h2>Customer information</h2>
+			<dl>
+				<dt>First name</dt>
+				<dd th:text="${customer.firstName}">John</dd>
+
+				<dt>Last name</dt>
+				<dd th:text="${customer.lastName}">Smith</dd>
+
+				<dt>Genre</dt>
+				<dd th:text="${customer.gender?.description}">Male</dd>
+
+				<dt>Payment method</dt>
+				<dd th:text="${customer.paymentMethod?.description}">Credit card</dd>
+
+				<dt>Balance</dt>
+				<dd th:text="'$' + ${customer.balance}">$350</dd>
+			</dl>
+			<!-- Include the banner here: using the DOM selector expression 
+				<div th:include="this :: [//div[@id='bannerElement']]">Banner</div>
+			-->
+			<div th:include="::#bannerElement">
+				<div class="banner">
+					<img alt="Thymeleaf logo" src="../../../images/logo.png"/>
+					<span>The Thymeleaf tutorial - static</span>
+				</div>
+			</div>
+		</body>
+	
+7- http://itutorial.thymeleaf.org/exercise/15
+	Use parameterizable fragment 
+
+	<div th:fragment="banner (bgColor, text)" th:remove="all">
+		<!-- <div class="banner " th:attrappend="class=${bgColor}"> -->
+		<div class="banner white" th:class="${'banner ' + bgColor}">
+			<img src="../../../images/logo.png" th:src="@{/images/logo.png}" alt="Thymeleaf logo" />
+			<span th:text="${text}">The Thymeleaf tutorial</span>
+		</div>
+	</div>
+	<div th:include="this :: banner ('white', 'Product information')">Banner</div>
+        
+		
+8- http://itutorial.thymeleaf.org/exercise/16
+	String concatenation: Using => String concatenation, Preprocessing, and Literal substitutions
+	
+		<h2>Concatenation</h2>
+        <span th:text="'Hello ' + ${customerName} + '!'">Hello, Peter!</span>
+        <h2>Preprocessing</h2>
+        <span th:text="'Hello __${customerName}__!'">Hello, Peter!</span>
+        <h2>Literal substitution</h2>
+        <span th:text="|Hello ${customerName}!|">Hello, Peter!</span>
+		
+		One more thing we usually use the Literal substitution in meessage resource implementation to handle internationalized texts:
+		In Messages_en.properties
+			bool.true=yes
+			bool.false=no
+		In html file
+			<td th:text="#{|bool.${isCovered}|}">yes</td>
+
+9- http://itutorial.thymeleaf.org/exercise/17
+	different types of comments: HTML comment, Thymeleaf comment, Generated-only content, and Prototype-only content
+	
+	<!-- HTML comment. This comment will be shown in both source and generated code. -->
+	<!--/* Thymeleaf comment or parser-level comment. This comment will be shown in source code but not in generated HTML. */-->
+	
+	Generated-only content: we want section [3] to be shown when the template is executed but not when it is opened statically.
+	<!--/*/
+	<dt>[3] Product price</dt>
+	<dd th:text="${product.price}">350</dd>
+	/*/-->
+	
+	Prototype-only content: we want section [4] to be shown when the template is opened statically but not when it is executed.
+	<!--/*-->
+		<footer>[4] Development mode!</footer>
+	<!--*/-->
+	
+
+10. http://itutorial.thymeleaf.org/exercise/19
+	 Assume a Customer class has a field called personalWebsite which contains the customer personal website URL, 
+	 or null if the customer does not have a personal website.
+	 Use the conditional th:remove to add a link for the customer personal website in the displayed first names, 
+	 if the customer has a website. If the customer does not have a website, simply print their first.
+	
+			<td th:inline="text">
+				<a th:href="${customer.personalWebsite}"
+				th:remove="${customer.personalWebsite}?'none':'tag'" 
+				>[[${customer.firstName}]]</a> 
+			</td>
+		OR
+			<td>
+				<a th:href="${customer.personalWebsite}"
+				   th:remove="${customer.personalWebsite == null} ? tag"
+				   th:text="${customer.firstName}">Peter</a>
+			</td>
+
+================================================================================================================================================
+================================================================================================================================================		
+													Thymeleaf + Spring 	
+================================================================================================================================================
+================================================================================================================================================	
+You can use the following project available on Git hub for reference:
+	https://github.com/thymeleaf/thymeleafexamples-stsm
+	
+================================================================================================================================================	 
+Using Spring Validations
+-------------------------
+> Field errors
+
+	<input type="text" th:field="*{datePlanted}" 
+                   th:class="${#fields.hasErrors('datePlanted')}? fieldError" />
+				   
+	<ul>
+	  <li th:each="err : ${#fields.errors('datePlanted')}" th:text="${err}" />
+	</ul>			   
+
+
+	Instead of iterating, we could have also used th:errors, a specialized attribute which builds a list 
+	with all the errors for the specified selector, separated by <br />:
+		<input type="text" th:field="*{datePlanted}" />
+		<p th:if="${#fields.hasErrors('datePlanted')}" th:errors="*{datePlanted}">Incorrect date</p>
+
+	Simplifying error-based CSS styling: th:errorclass
+		<input type="text" th:field="*{datePlanted}" class="small" th:errorclass="fieldError" />
+	this will render as:
+		<input type="text" id="datePlanted" name="datePlanted" value="2013-01-01" class="small fieldError" />
+
+> All errors
+	
+		<ul th:if="${#fields.hasErrors('*')}">
+		  <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
+		</ul>
+	OR
+		<ul>
+		  <li th:each="err : ${#fields.errors('*')}" th:text="${err}" />
+		</ul>
+	As well as build a <br />-separated list:
+		<p th:if="${#fields.hasErrors('all')}" th:errors="*{all}">Incorrect date</p>	
+
+	Finally note that #fields.hasErrors('*') is equivalent to #fields.hasAnyErrors() 
+	and #fields.errors('*') is equivalent to #fields.allErrors(). Use whichever syntax you prefer:
+		<div th:if="${#fields.hasAnyErrors()}">
+		  <p th:each="err : ${#fields.allErrors()}" th:text="${err}">...</p>
+		</div>
+
+> Global errors
+	There is a third type of error in a Spring form: global errors. These are errors that are not 
+	associated with any specific fields in the form, but still exist.	
+	
+		<ul th:if="${#fields.hasErrors('global')}">
+		  <li th:each="err : ${#fields.errors('global')}" th:text="${err}">Input is incorrect</li>
+		</ul>
+	Or as build a <br />-separated list:
+		<p th:if="${#fields.hasErrors('global')}" th:errors="*{global}">Incorrect date</p>	
+	As well as equivalent #fields.hasGlobalErrors() and #fields.globalErrors() convenience methods:
+		<div th:if="${#fields.hasGlobalErrors()}">
+		  <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">...</p>
+		</div>
+			
+> Displaying errors outside forms
+	Form validation errors can also be displayed outside forms by using variable (${...}) 
+	instead of selection (*{...}) expressions and prefixing the name of the form-backing bean:
+
+	<div th:errors="${myForm}">...</div>
+	<div th:errors="${myForm.date}">...</div>
+	<div th:errors="${myForm.*}">...</div>
+
+	<div th:if="${#fields.hasErrors('${myForm}')}">...</div>
+	<div th:if="${#fields.hasErrors('${myForm.date}')}">...</div>
+	<div th:if="${#fields.hasErrors('${myForm.*}')}">...</div>
+
+	<form th:object="${myForm}">
+		...
+	</form>
+	
+> Rich error objects
+	Thymeleaf offers the possibility to obtain form error information in the form of beans (instead of mere strings), 
+	with the fieldName (String), message (String) and global (boolean) attributes.
+
+	These errors can be obtained by means of the #fields.detailedErrors() utility method:
+		<ul>
+			<li th:each="e : ${#fields.detailedErrors()}" th:class="${e.global}? globalerr : fielderr">
+				<span th:text="${e.global}? '*' : ${e.fieldName}">The field name</span> |
+				<span th:text="${e.message}">The error message</span>
+			</li>
+		</ul>	
+================================================================================================================================================
+Using Spring Conversion Service
+---------------------------------		 
+Formatters such as date formater, price formater, etc. can be registered using the Spring Conversion Service.
+Use the new ${{..}} syntax to format these beans using the Conversion Service.
+	i.e 
+		<dt>Product price:</dt>
+		<dd th:text="${{price}}">$150</dd>
+		
+		<dt>Product release date:</dt>
+		<dd th:text="${{releaseDate}}">23-Jan-2014</dd>	
+		
+		<input type="text" th:field="*{{datePlanted}}" />
+		
+		
+#conversions utility object: allows the manual execution of the Conversion Service
+	i.e
+		#conversions.convert(Object,Class): converts the object to the specified class.
+		#conversions.convert(Object,String): same as above, but specifying the target class as a String (note the java.lang. package can be ommitted).
+		
+================================================================================================================================================		
+Rendering Template Fragments	
+-----------------------------	
+	I cannot find the importance of that part, although I added as a title to let you know that there is somthing like that.	
+		
+================================================================================================================================================
+Advanced Integration Features		
+------------------------------
+	1. Integration with RequestDataValueProcessor: This interface allows the interception of link URLs, 
+			form URLs and form field values before they are written to the markup result, as well as 
+			transparently adding hidden form fields that enable security features like e.g. protection agains CSRF (Cross-Site Request Forgery).
+
+	2. Building URIs to controllers
+			Since version 4.1, Spring allows the possibility to build links to annotated controllers directly from views, 
+			without the need to know the URIs these controllers are mapped to.
+
+			In Thymeleaf, this can be achieved by means of the #mvc.url(...) expression object method, which allows the specification 
+			of controller methods by the capital letters of the controller class they are in, followed by the name of the method itself. 
+			This is equivalent to JSP’s spring:mvcUrl(...) custom function.
+			
+			For example,
+			public class ExampleController {
+
+				@RequestMapping("/data")
+				public String getData(Model model) { ... return "template" }
+
+				@RequestMapping("/data")
+				public String getDataParam(@RequestParam String type) { ... return "template" }
+
+			}
+			
+			The following code will create a link to it:
+				<a th:href="${(#mvc.url('EC#getData')).build()}">Get Data Param</a>
+				<a th:href="${(#mvc.url('EC#getDataParam').arg(0,'internal')).build()}">Get Data Param</a>
+================================================================================================================================================
+Spring WebFlow integration
+---------------------------		
+
+
+
+
+
+
+
+
+Extending the power of Thymeleaf

@@ -1,0 +1,859 @@
+Java Bitwise 
+--------------
+ & (AND) -> is for checking the equality
+ ___________________________________________
+	if 2 operands not equal, AND yields to ZEROS
+	if 2 operands are equal (have same representation of bits), AND yields to same bits
+	
+	Ex.    010								010
+         & 001							  & 010
+		 ------               			  ------
+		   000 								010
+	
+	x&x = x				x&(~x) = 0
+	
+
+ | (OR) -> is for adding unpresented set bits(ones) in one operand to another operand
+ _____________________________________________________________________________________
+	if 2 operands not equal, OR could yields to Adding Mathimatically or just return the same bits
+	if 2 operands are equal (have same representation of bits), OR yields to same bits
+
+	Ex.    010		  010					010
+         | 001		| 011				  | 010
+		 ------     ------          	  ------
+		   011 		  011					010
+
+	x|x = x 			x|(~x) = -1
+
+ ^ (XOR) -> is for add then remove OR remove then add
+ ______________________________________________________
+	if 2 operands not equal, XOR yields to ONES
+	if 2 operands are equal (have same representation of bits), XOR yields to ZEROS
+
+	x^x = 0				x^(~x) = -1
+
+	Usage:
+	Basically, it makes use of the fact that x^x = 0. So all paired elements get XOR'd and vanish leaving the lonely element.
+		EX. Finding the element which appears once in an array - containing other elements each appearing twice". 
+		    Solution is to XOR all the elements and you get the answer.
+
+
+
+Helpfull Notes:
+---------------
+	0xaaaaaaaa  bit level representation is -> 1010 1010 1010 1010 1010 1010 1010 1010
+	0x55555555  bit level representation is -> 0101 0101 0101 0101 0101 0101 0101 0101
+
+	How to turn off the rightmost set bit for number n?  use n & (n - 1) as well as, 
+	How to check if the number n is power of two?  if n & (n - 1) == 0
+	
+	How to compute modulus division by a power-of-2-number? 
+		For example if n = 6 (00..110) and d = 4(00..100). Last set bit in d is at position 3 (from right side). 
+		So we need to return last two bits of n as they are and other bits as 0, i.e., 00..010.
+		Again we can use somthing like n & (d - 1).
+	
+	How to turn off a particular bit in a number?
+		The idea is to use bitwise <<, & and ~ operators. Using expression "~(1 << (k – 1))“, 
+		we get a number which has all bits set, except the k’th bit. If we do bitwise & of this expression with n, 
+		we get a number which has all bits same as n except the k’th bit which is 0.
+						if (k <= 0) return n; 
+						return (n & ~(1 << (k - 1))); 
+
+	How to swap bits in a given number?
+		Let p1 and p2 be the two given positions.
+		Example:
+			Input:
+				x = 47 (00101111)
+				p1 = 1 (Start from the second bit from the right side)
+				p2 = 5 (Start from the 6th bit from the right side)
+				n = 3 (No of bits to be swapped)
+			Output:
+				227 (11100011)
+		First thing you need to get the bits that need to be swapped in two different sets.
+		To accomplish that you can again use the magic of <<, &, and -1 as follows:
+			// Move all bits of first set 
+			// to rightmost side  
+			int set1 = (x >> p1) & ((1 << n) - 1); 
+		  
+			// Move all bits of second set  
+			//to rightmost side  
+			int set2 = (x >> p2) & ((1 << n) - 1); 
+		OR you can do it using the power of 2 numbers as a mask with << and | operators as follows:
+			// Step 1: get first and second sets of bits that need to be swapped
+			int set1 = 0;
+			for (int i = p1; i < p1+n; i++) {
+				set1 |= (mask << i) & x;
+			} 
+			
+			int set2 = 0;
+			for (int i = p2; i < p2+n; i++) {
+				set2 |= (mask << i) & x;
+			}
+		
+Solved Topic 
+--------------		
+All elements appear odd number of times. 
+	Given an array where every element occurs three times, except one element which occurs only once. Find the element that occurs once. 
+	
+	public static void main(String[] args) {
+		//int arr[] = { 1, 1, 1, 3, 3, 3, 20, 4, 4, 4 };		
+		int arr[] = { 4, 4, 4, 3, 3, 3, 2 };		
+		int ones = 0;
+		int twos = 0;
+		int not_threes;
+		
+		for (int i = 0; i < arr.length; i++) {
+			int x = arr[i];
+
+			/*
+			 * "one & arr[i]" gives the bits that are there in both 'ones' and
+			 * new element from arr[]. We add these bits to 'twos' using bitwise
+			 * OR
+			 */
+			twos |= ones & x;
+
+			/*
+			 * if bits of x not in ones then add x, otherwise if x already
+			 * presented in ones remove x from ones
+			 */
+			ones ^= x;
+
+			/*
+			 * the bits representation that are repeated for three times, will
+			 * be presented or common in both ones and twos. To get those common
+			 * bits we need to use AND
+			 */
+			int threes = (ones & twos);
+
+			/*
+			 * By doing not, we will get the bits that not repeated yet for
+			 * third time
+			 */
+			not_threes = ~(ones & twos);
+
+			/*
+			 * By doing AND, we gonna keep only those bits that are not repeated
+			 * yet for third time
+			 */
+			ones &= not_threes;
+			twos &= not_threes;
+		}
+
+		System.out.println("unique element = " + ones);
+
+	}
+	
+	Explanation 
+		1st example
+		------------
+		1, 1, 1, 2
+
+		After first iteration,
+		ones = 1, twos = 0
+		After second iteration,
+		ones = 0, twos = 1
+		After third iteration,
+		ones = 0, twos = 0
+		After fourth iteration,
+		ones = 2, twos = 0
+
+		2nd example
+		------------
+		2, 1, 1, 1
+
+		After first iteration,
+		ones = 2, twos = 0
+		After second iteration,
+		ones = 3, twos = 0
+		After third iteration,
+		ones = 2, twos = 1
+		After fourth iteration,
+		ones = 2, twos = 0
+		
+		
+Detect if two integers have opposite signs
+
+	static boolean oppositeSigns(int x, int y) {
+		return ((x ^ y) < 0);
+	}
+	
+	
+Add 1 to a given number
+		
+	static int addOne(int x) {
+		// for number that has a first bit = 1 ex. 3, 5, 7, 9, 11, etc
+		if ((x | 1) == x) {
+			// to get the added one numbers in this case but in negative format
+			x ^= -1;
+			
+			/* to negate this numbers again
+			 * Java uses Complement Two representation to represent negative numbers. 
+			 * In order to change a sign, it means you must do a bitwise negation and add 1.
+			 */
+			x = ~x + 1;		
+		} else {
+			// for others
+			x |= 1;
+		}
+		
+		return x;
+	}
+
+	OR
+	static int addOne(int x) { 
+        int m = 1; 
+          
+        // Flip all the set bits  
+        // until we find a 0  
+        while((int)(x & m) >= 1) { 
+        	x = x ^ m; 
+            m <<= 1; 
+        } 
+      
+        // flip the rightmost 0 bit  
+        x = x ^ m; 
+        return x; 
+    }
+	
+	OR
+	static int addOne(int x) { 
+         return (-(~x)); 
+    }
+	
+	
+Swapping 2 numbers without using a 3rd variable
+	static void swap(int x, int y) { 
+         x = x ^ y; 
+		 y = x ^ y; 
+		 x = x ^ y; 
+    }
+	
+	OR use arithmatic
+	int x = 10; 
+	int y = 5; 
+	x = x + y; 
+	y = x - y; 
+	x = x - y; 
+
+
+Multiply a given Integer with 3.5
+	static int multiplyWith3Point5(int x) {
+		int r = 0;
+
+		// The 3.5 is 7/2, so multiply by 7 (x * 7) then divide the result by 2 (result/2)		
+		// x * 7 -> 7 is 0111 so by doing mutiply by 7 it means we do 2 shifting for the number
+		// but since we doing multiply we need to take care of carry one.
+		
+		
+		int x1Shift = x<<1;
+		int x2Shifts = x<<2;
+		
+		r = (x ^ x1Shift) ^ x2Shifts;
+		int c = (x & x1Shift) | (x & x2Shifts) | (x1Shift & x2Shifts);
+		while (c > 0) {
+			c <<= 1;			
+			int t = r;					
+			r ^= c;			
+			c &= t;
+		}
+		
+		
+		// then divide by 2
+		r = r >> 1; // r / 2
+
+		return r;
+	}
+
+	OR -> adding 2*x, x and x/2
+	static int multiplyWith3Point5(int x) 
+    { 
+        return (x<<1) + x + (x>>1); 
+    }
+	
+	OR ->  (8*x – x)/2 
+	int multiplyWith3Point5(int x) 
+	{ 
+	  return ((x<<3) - x)>>1; 
+	}
+	
+
+Turn off the rightmost set bit
+	static int turnOffRightmostSetBit(int n) {
+		int mask = 1;		
+		int r = 0;
+		while(r == 0) {
+			r = n & mask;
+			if(r > 0) return n^r;
+			mask <<= 1;
+		}
+		return 0;
+	}
+	
+	OR
+	static int turnOffRightmostSetBit(int n) 
+    { 
+        return n & (n - 1); 
+    }
+	
+	
+Find whether a given number is a power of 4
+	static boolean isPowerOfFour(int n) {
+		int powerOfFourNumber = 1;
+		while(powerOfFourNumber < n) {
+			powerOfFourNumber <<= 2;
+			if(powerOfFourNumber == n) return true;
+		}
+		
+		return false;
+	}
+	
+	OR
+	static boolean isPowerOfFour(int n) { 
+        return n != 0 && ((n&(n-1)) == 0) && (n & 0xAAAAAAAA) == 0; 
+    }
+	
+	So to get the is power of two:
+	/* Method to check if x is power of 2*/
+    static boolean isPowerOfTwo (int x) 
+    { 
+      /* First x in the below expression is  
+        for the case when x is 0 */
+        return x!=0 && ((x&(x-1)) == 0); 
+          
+    } 
+	
+Rotate bits of a number
+	/*Function to left rotate n by d bits*/
+	static int leftRotate(int n, int d) { 
+		  
+		/* In n<<d, last d bits are 0.  
+		   To put first 3 bits of n at 
+		   last, do bitwise or of n<<d with 
+		   n >>(INT_BITS - d) */
+		return (n << d) | (n >> (INT_BITS - d)); 
+	} 
+	  
+	/*Function to right rotate n by d bits*/
+	static int rightRotate(int n, int d) { 
+		  
+		/* In n>>d, first d bits are 0.  
+		   To put last 3 bits of at 
+		   first, do bitwise or of n>>d  
+		   with n <<(INT_BITS - d) */
+		return (n >> d) | (n << (INT_BITS - d)); 
+	}
+	
+Find the Number Occurring Odd Number of Times
+	static int getOddOccurrence(int arr[]) {
+		int n = 0;
+		for (int i = 0; i < arr.length; i++) {
+			n ^= arr[i];
+		}
+		
+		return n;
+	}
+	
+Count set bits in an integer
+	/* Function to get no of set  
+    bits in binary representation  
+    of positive integer n */
+    static int countSetBits(int n) 
+    { 
+        int count = 0; 
+        while (n > 0) { 
+            count += n & 1; 
+            n >>= 1; 
+        } 
+        return count; 
+    }
+
+	OR
+	/*assuming Integers are stored in 16 bits*/
+	static int countSetBits(int n) {
+		int mask = 1, count = 0;
+		for (int i = 1; i < 17; i++) {
+			if((n & mask) == mask) count++;
+			mask <<= 1;
+		}
+		
+		return count;
+	}
+	
+	OR
+	// Function that count set bits 
+    public static int countSetBits(int n) 
+    { 
+        int count = 0; 
+        while (n != 0) { 
+            count++; 
+            n &=(n-1); 
+        } 
+        return count; 
+    }
+	
+
+Position of rightmost set bit
+
+	static int getRightmostSetBitPosition(int x) {
+		int mask = 1, position = 0;
+		int v = (x & (x - 1)) ^ x;
+		if(v == mask) return 1;
+		while(mask != v) {
+			position++;
+			mask <<= 1;
+		}
+		return ++position;
+	}
+	
+
+Binary representation of a given positive or negative number
+	
+	Note1: Java stored the negative numbers in two's complement. 
+		   Negative numbers are representing by negating (flipping) all the bits and then adding 1. 
+		   Still, if the leftmost bit is 0, the number is positive. Otherwise, it is negative.
+		Ex. System.out.println((~-3) + 1); will print 3 
+	
+	Note2: We can use the same program to print the Reverse Bits representation of a Number 
+		   by not reversing StringBuilder in the follwoing program. 
+	
+	Note3: Java Convert Binary to Decimal
+		String binaryString = "010";
+		int decimal = Integer.parseInt(binaryString, 2);
+		System.out.println(decimal); // prints 2
+	
+	static String printBinaryRepresentation(long n) {
+		int mask = 1;
+		StringBuilder s = new StringBuilder();
+
+		if (n == 0)
+			return "0000";
+
+		// Negative number
+		if (n < 0) {
+			return printBinaryRepresentation(256 + n);
+		}
+
+		// Positive number
+		while ((n | 0) != 0) { // n > 0
+			s.append((n & mask) == mask ? "1" : "0");
+			n >>= 1;
+		}
+
+		s.reverse();
+		return s.length() < 4 ? String.format("%0" + (4 - s.length()) + "d%s", 0, s.toString()) : s.toString();
+	}
+	
+	OR for only positive number
+	static void bin(Integer n)  
+	{  
+		if (n > 1)  
+		bin(n>>1);  
+		  
+		System.out.printf("%d", n & 1);  
+	} 
+	
+	
+Swap bits in a given number
+	static int swapBits(int x, int p1, int p2, int n) {
+		int mask = 1;
+		
+		// Step 1: get first and second sets of bits that need to be swapped
+		int set1 = 0;
+		for (int i = p1; i < p1+n; i++) {
+			set1 |= (mask << i) & x;
+		} 
+		
+		int set2 = 0;
+		for (int i = p2; i < p2+n; i++) {
+			set2 |= (mask << i) & x;
+		}
+		
+		// Step 2: turn off those bits in the original number
+		x ^= set1;
+		x ^= set2;
+		
+		// Step 3: move the bits in each group in the position of the other group
+		//         by shift left the first set bits and right shift the second set bits
+		int shiftCount = p2 - p1;
+		set1 <<= shiftCount;
+		set2 >>= shiftCount;
+		
+		// Step 4: add both groups with its new position to the number			
+		return (x ^ set1) ^ set2;
+	}
+	
+	OR
+	static int swapBits(int x, int p1, int p2, int n) 
+    { 
+        // Move all bits of first set 
+        // to rightmost side  
+        int set1 = (x >> p1) & ((1 << n) - 1); 
+      
+        // Move all bits of second set  
+        //to rightmost side  
+        int set2 = (x >> p2) & ((1 << n) - 1); 
+      
+        // XOR the two sets  
+        int xor = (set1 ^ set2); 
+      
+        // Put the xor bits back to  
+        // their original positions  
+        xor = (xor << p1) | (xor << p2); 
+      
+        // XOR the 'xor' with the original number  
+        // so that the  two sets are swapped  
+        int result = x ^ xor; 
+      
+        return result; 
+    }
+	
+Smallest power of 2 greater than or equal to n
+	static int getSmallestPowerOfTwo(int n) {
+		int mask = 1;
+		while (mask < n)  
+			mask <<= 1; 
+		
+		return mask;
+	}
+	
+	OR
+	static int getSmallestPowerOfTwo(int n) {
+		int mask = 1;
+		if(n == 0) return 1;
+		int t = n;
+		while(t > 0 && mask != n) {
+			t >>= 1;
+			mask <<= 1;
+		}
+		
+		return mask;
+	}
+	
+	OR
+	static int nextPowerOf2(int n) 
+    { 
+        int count = 0; 
+  
+        // First n in the below  
+        // condition is for the  
+        // case where n is 0 
+        if (n > 0 && (n & (n - 1)) == 0) 
+            return n; 
+  
+        while(n != 0) 
+        { 
+            n >>= 1; 
+            count += 1; 
+        } 
+  
+        return 1 << count; 
+    }
+	
+	
+Swap all odd and even bits
+	static int swapOddEvenBits(int x) {
+		return ((x << 1) & 0xaaaaaaaa) | ((x >> 1) & 0x55555555);
+	}
+	
+
+Check if binary representation of a number is palindrome
+	// This function returns true if binary
+	// representation of x is palindrome.
+	// For example (1000...001) is paldindrome
+	// Java use 32 bits to represent integers
+	static boolean isPalindrome(int x) {
+		int r = 1, rMask = r; // Initialize right position
+		int l = 0;
+		long lMask = 0; // initialize left position
+
+		// get the position of the leftmost set bit
+		int t = x;
+		while (t != 0) {
+			t >>= 1;
+			l++;
+		}
+		lMask = (long) Math.pow(2, l - 1);
+
+		// One by one compare bits
+		while (r < l) {
+			long rBit = (((x >> r - 1) & rMask) == rMask) ? 1 : 0;
+			long lbit = (((x << r - 1) & lMask) == lMask) ? 1 : 0;
+			if (lbit != rBit)
+				return false;
+
+			r++;
+			l--;
+		}
+		return true;
+	}
+
+	OR 
+	static boolean isPalindrome_1(int n) {
+		boolean isPalindrome = false;
+		if ((n & (n - 1)) == 0) {// power of 2
+			isPalindrome = false;
+		} else if ((n & (n - 1)) == (n - 1)) {// if n is 1 less than power of 2
+			isPalindrome = true;
+		}
+
+		return isPalindrome;
+	}
+
+
+Calculate square of a number without using *, / and pow()
+	Without using bitwise operators, the time complexity of the following solution is O(n). 
+	We can do it in O(Logn) time using bitwise operators.
+	
+	public static int square(int n) { 
+        // handle negative input 
+        if (n < 0) 
+            n = -n; 
+      
+        // Initialize result 
+        int res = n; 
+      
+        // Add n to res n-1 times 
+        for (int i = 1; i < n; i++) 
+            res += n; 
+      
+        return res; 
+    }
+	
+	Bitwise Operator solution
+	/* 
+	 *  The idea is based on the following fact.
+	 *
+	 *  square(n) = 0 if n == 0
+		  if n is even 
+		     square(n) = 4*square(n/2) 
+		  if n is odd
+		     square(n) = 4*square(floor(n/2)) + 4*floor(n/2) + 1 
+	 * */
+	static int square(int n) { 
+		if(n == 0) return 0;
+		
+		if(n < 0) n = ~n + 1;
+		
+		int half = n >> 1;
+		int res = square(half) << 2; //4*square(n/2) OR 4*square(floor(n/2))
+		
+		// check whether the number is even or odd 
+		if((n & 1) == 1) { // odd numbers
+			res += (half << 2) + 1;				
+		}
+		
+		return res;
+	}
+
+
+Generate 0 and 1 with 25% and 75% probability
+	Given a function rand50() that returns 0 or 1 with equal probability, write a function that returns 1 with 75% probability 
+	and 0 with 25% probability using rand50() only. Minimize the number of calls to rand50() method. Also, 
+	use of any other library function and floating point arithmetic are not allowed.
+	
+	The idea is to use Bitwise OR. A bitwise OR takes two bits and returns 0 if both bits are 0, while otherwise the result is 1. 
+	So it has 75% probability that it will return 1.
+	
+	// Random Function to that returns 0 or 1 with  
+    // equal probability  
+    static int rand50() { 
+        // rand() function will generate odd or even  
+        // number with equal probability. If rand()  
+        // generates odd number, the function will  
+        // return 1 else it will return 0.  
+        return (int) (10 * Math.random()) & 1; 
+    } 
+  
+    // Random Function to that returns 1 with 75%  
+    // probability and 0 with 25% probability using  
+    // Bitwise OR  
+    static int rand75() { 
+        return rand50() | rand50(); 
+    }
+
+
+Find even occurring elements in an array of limited range
+	Given an array that contains odd number of occurrences for all numbers except for a few elements which are present even number of times. 
+	Find the elements which have even occurrences in the array in O(n) time complexity and O(1) extra space.
+	Assume array contain elements in the range 0 to 63.
+
+	// Function to find the even occurring  
+	// elements in given array  
+	static void printRepeatingEven(int arr[], int n) { 
+		long _xor = 0L; 
+		long pos; 
+	  
+		// do for each element of array  
+		for (int i = 0; i < n; ++i)  
+		{ 
+			// left-shift 1 by value of  
+			// current element  
+			pos = 1 << arr[i]; 
+	  
+			// Toggle the bit everytime  
+			// element gets repeated  
+			_xor ^= pos; 
+		} 
+	  
+		// Traverse array again and use _xor  
+		// to find even occurring elements  
+		for (int i = 0; i < n; ++i) { 
+			// left-shift 1 by value of  
+			// current element  
+			pos = 1 << arr[i]; 
+	  
+			// Each 0 in _xor represents 
+			// an even occurrence  
+			if (!((pos & _xor)!=0))  
+			{ 
+				// print the even occurring numbers  
+				System.out.print(arr[i] + " "); 
+	  
+				// set bit as 1 to avoid  
+				// printing duplicates  
+				_xor ^= pos; 
+			} 
+		} 
+	} 
+
+
+Find the two non-repeating elements in an array of repeating elements
+	Asked by SG
+	Given an array in which all numbers except two are repeated once. 
+	(i.e. we have 2n+2 numbers and n numbers are occurring twice and remaining two have occurred once). 
+	Find those two numbers in the most efficient way.
+
+	static void print2NonRepeatingNos(int[] arr) {
+		long pos = 0;
+		long xor = 0L;
+		
+		// in the xor, all set bits are representing the numbers that repeated odd times
+		// and all zero bits representing the numbers that repeated even numbers of time 
+		for (int i = 0; i < arr.length; i++) {
+			pos = 1 << arr[i];			
+			xor ^= pos;
+		}
+
+		System.out.println(" Non repeating numbers for " + Arrays.toString(arr));
+		for (int i = 0; i < arr.length; i++) {
+			pos = 1 << arr[i];	
+			if((pos & xor) > 0) { 
+				System.out.print(arr[i] + " ");
+				xor ^= pos;
+			}						
+		}
+		System.out.print("\n");
+		
+	}
+
+
+Copy set bits in a range
+	Given two numbers x and y, and a range [l, r] where 1 <= l, r <= 32. The task is consider set bits of y in range [l, r] 
+	and set these bits in x also. Examples :
+
+	Input  : x = 10, y = 13, l = 2, r = 3
+	Output : x = 14
+	Binary representation of 10 is 1010 and 
+	that of y is 1101. There is one set bit
+	in y at 3’rd position (in given range). 
+	After we copy this bit to x, x becomes 1110
+	which is binary representation of 14.
+
+	Input  : x = 8, y = 7, l = 1, r = 2
+	Output : x = 11
+	
+	static int copySetBitsInRange(int x, int y, int l, int r) {
+		// l and r must be between 1 to 32 
+	    if (l < 1 || r > 32) 
+	        return 0;
+	    	
+		int t = x;
+		for (int i = l; i < r+1; i++) {
+			t |= (y & (1 << (i - 1)));
+		}
+		//t |= (y & (1 << (l - 1))) | (y & (1 << (r - 1)));		
+		return t;
+	}
+
+UnSolved Topic (Left for practicing) 
+------------------------------------
+Generate n-bit Gray Codes
+	Given a number n, generate bit patterns from 0 to 2^n-1 such that successive patterns differ by one bit.
+	Examples:
+
+	Following is 2-bit sequence (n = 2)
+	  00 01 11 10
+	Following is 3-bit sequence (n = 3)
+	  000 001 011 010 110 111 101 100
+	And Following is 4-bit sequence (n = 4)
+	  0000 0001 0011 0010 0110 0111 0101 0100 1100 1101 1111 
+	  1110 1010 1011 1001 1000
+	  
+Check if a given number is sparse or not
+	A number is said to be a sparse number if in binary representation of the number no two or more consecutive bits are set. 
+	Write a function to check if a given number is Sparse or not.
+	Example :
+
+	Input:  x  = 72
+	Output: true
+	Explanation:  Binary representation of 72 is 01001000. 
+	There are no two consecutive 1's in binary representation
+
+	Input:  x  = 12
+	Output: false
+	Explanation:  Binary representation of 12 is 1100. 
+	Third and fourth bits (from end) are set.	  
+
+
+Find nth Magic Number
+	A magic number is defined as a number which can be expressed as a power of 5 or sum of unique powers of 5. 
+	First few magic numbers are 5, 25, 30(5 + 25), 125, 130(125 + 5), ….
+	Write a function to find the nth Magic number.
+
+	Example:
+
+	Input: n = 2
+	Output: 25
+
+	Input: n = 5
+	Output: 130 
+	
+
+How to swap two bits in a given integer?
+	Given an integer n and two bit positions p1 and p2 inside it, 
+	swap bits at the given positions. The given positions are from least significant bit (lsb). 
+	For example, the position for lsb is 0.
+	Examples:
+
+	Input: n = 28, p1 = 0, p2 = 3
+	Output: 21
+	28 in binary is 11100.  If we swap 0'th and 3rd digits, 
+	we get 10101 which is 21 in decimal.
+
+	Input: n = 20, p1 = 2, p2 = 3
+	Output: 24	
+
+
+How to check if a number is Bleak?
+	A number ‘n’ is called Bleak if it cannot be represented as sum of a positive number x and set bit count in x, 
+	i.e., x + countSetBits(x) is not equal to n for any non-negative number x.
+
+	Examples :
+	Input : n = 3
+	Output : false
+	3 is not Bleak as it can be represented
+	as 2 + countSetBits(2).
+
+	Input : n = 4
+	Output : true
+	4 is t Bleak as it cannot be represented 
+	as sum of a number x and countSetBits(x)
+	for any number x.
+	
+	Method 1 (Simple)
+		bool isBleak(n)
+		1) Consider all numbers smaller than n
+			a) If x + countSetBits(x) == n
+				   return false
+
+		2) Return true

@@ -1,0 +1,130 @@
+oninit , onspaces , onmode , onparams , ontape
+Investigate 	onstat
+		onstat -l	Print logging
+		onstat -d
+		onstat -g
+
+used values are onmode -k
+Investigate 	onmode -k [y]
+		onmode -l
+		onmode -c
+
+-------------------------------------------------------------------------------------------------
+
+To know the current database collation
+---------------------------------------
+select * from sysdbslocale
+OR
+select * from sysmaster:sysopendb 
+OR
+select * from sysmaster:systabnames 
+
+-------------------------------------------------------------------------------------------------
+
+To list all constraints in databases 
+------------------------------------
+SELECT constrname, owner FROM informix.sysconstraints
+
+-------------------------------------------------------------------------------------------------
+
+
+To know the informix status
+---------------------------
+onstat -
+
+-------------------------------------------------------------------------------------------------
+
+To Know the dbspaces and associated chuncks and it's sizes
+-----------------------------------------------------------
+onstat -d
+
+-------------------------------------------------------------------------------------------------
+
+To create the first chunk on the dbspace
+-----------------------------------------
+onspaces -c -d log_dbs -p E:\IFMXDATA\ol_server\log_dbs_dat.001 -s 601264 -o 0
+
+To create new chunk with 50M size on ol_server dbspace
+-------------------------------------------------------
+First : you have to create file with name ol_server_dat.002 in the path E:\IFMXDATA\ol_server\
+
+Second : you have to run the following command
+	onspaces -a ol_server -p E:\IFMXDATA\ol_server\ol_server_dat.001 -s 87524 -o 0
+
+
+
+Add log files to the above log dbspace -> log_dbs
+--------------------------------------------------
+onparams -a -d log_dbs -s 10000
+
+*page size by default 4k to change it 
+    onspaces -c -d log_dbs -p E:\IFMXDATA\ol_server\log_dbs_dat.000 -s 50000 -o 0 -k 8
+ now the page size will be 8k for chunks under log_dbs dbspace
+*but to know the current page size run -> onstat -d ->> but the page size is displayed by byte
+ so u need to divide it by 1024
+
+Create SbSpace for larg object :
+
+onspaces -c -S sbsp4 -p yourPath -o 0 -s 1000000
+
+-------------------------------------------------------------------------------------------------
+
+To import or export database
+----------------------------- 
+dbimport prd_dbs -c -d ol_server -i C:\ExportedDBs -l
+dbexport prd_dbs -o E:\
+
+-------------------------------------------------------------------------------------------------
+
+To run any command continously in fixed time add <command nam> <command params> -r fixedTime
+like
+onstat -l -r 5
+
+-------------------------------------------------------------------------------------------------
+
+To redirect all output info to the file hany.txt on c directory
+---------------------------------------------------------------
+onstat -a >> c:\hany.txt
+This line can get also the path of onconfig file
+
+-------------------------------------------------------------------------------------------------
+
+To backup your physical data 
+----------------------------
+ontape -s -L 0 
+This line will backup your physical data on server in the path that stored in onconfig file 
+under the division TAPEDEV
+
+To backup logical logs
+----------------------
+ontape -a
+
+To let backup operation forlogs work automatically
+---------------------------------------------------
+ontape -c -->> but the drawbacks that's this command will create unlimited no. of files like ltap0,ltap1,....
+
+
+To restore your databse 
+-------------------------
+onmode -ky
+ontape -p
+in the first question you need to answer by yes but
+the second and third questions one answer by no
+
+-------------------------------------------------------------------------------------------------
+
+To change the logging mode 
+---------------------------
+ondblog <the new mode> <database name>
+		       -f fileThatContainsDataBases		
+
+OR
+
+for unBufferd ->> ontape -s -L 0 -U <database name>
+for Bufferd ->> ontape -s -L 0 -B <database name>
+
+-------------------------------------------------------------------------------------------------
+
+To install demo7 database
+---------------------------
+dbaccessdemo7

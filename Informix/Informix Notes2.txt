@@ -1,0 +1,224 @@
+ To see any command page by page add |more
+------------------------------------------------------------------------------------------------
+
+svc_drda -->> ol_server
+1526     -->> 9089
+------------------------------------------------------------------------------------------------
+
+To know informix path for client 
+--------------------------------
+open setnet then go to INFORMIXDIR
+
+------------------------------------------------------------------------------------------------
+Backup & Restore    -->> scope of ol_server and its databases
+
+
+dbimport & dbexport -->> scope of databases under ol_server
+
+
+load & unload       -->> scope of records, columns and can be run from shell as called routine 
+                          so that u can drive it to skip record(s) with error
+ ( 
+   load from c:\sect.unl insert into sect
+   unload to c:\sect.unl select * from sect
+ )
+ run as sql statement
+
+
+
+
+DBLoad            -->> Like load & unload
+		       scope of records, columns and can be run from shell as called routine 
+                       so that u can drive it to skip record(s) with error
+first  : run unload to c:\sect.unl select * from sect
+second : delete all rows in this table -->> delete from sect where 1=1
+third  : run this command dbload -d per_pay -c c:\cfilename.txt -l c:\logErr -e 10 -r
+
+
+
+onunload , onload -->> scope of databases under ol_server OR
+		       scope of records, columns and can be run from shell as called routine 
+                       so that u can drive it to skip record(s) with error 
+
+
+
+------------------------------------------------------------------------------------------------
+
+Edit in the ol_server
+in the path: E:\Program Files\IBM\IBM Informix Dynamic Server\11.50\ol_server.cmd
+
+
+Add this line to set date format (set DBDATE=DMY/2)
+u can run this file for the current dbaccess session b4 u run dbimport
+
+------------------------------------------------------------------------------------------------
+
+- By default u will find dbspace called rootdbs with one chunk for system databases
+  and have default 6 log files	
+  and in our installation we add dbspace called ol_server with 
+  the same name of the server we already created
+
+------------------------------------------------------------------------------------------------
+
+the size of file created after dbexport
+if multiplied by 4(page size by kb) this will = to max. size for data chunks under dbspace 
+need to be created
+and we need to create dbspace for logs = max. size for data chunks under dbspace 
+
+------------------------------------------------------------------------------------------------
+
+to get help for any command 
+write the <command name> --
+like onspaces -- , onmode -- 
+
+------------------------------------------------------------------------------------------------
+
+To know the host name that the current database 
+run this function on any database 
+select dbinfo('dbhostname') from systables
+
+------------------------------------------------------------------------------------------------ 
+ 
+to shutdown server onmode -ky
+to start it again  oninit
+------------------------------------------------------------------------------------------------ 
+
+Online Ref URL :
+http://publib.boulder.ibm.com/infocenter/idshelp/v111/index.jsp?topic=/com.ibm.po.doc/new_features.htm
+------------------------------------------------------------------------------------------------ 
+URL : http://blogimg.chinaunix.net/blog/upfile2/090310164227.pdf
+
+The index fill factor specifies the percent fullness of each node at the time the index is
+created. FILLFACTOR is not maintained over the life of the index. A high fill factor will
+initially produce a more compact index, providing more efficient caching, and potentially
+reducing the number of page reads required to service an index search. For indexes on
+read only tables, be sure to use a fill factor of 100. Also, indexes on tables that will
+receive SELECT and DELETEs only should be created with a fill factor of 100 to reduce
+the likelihood that merging and shuffling will be required.
+On the flip side, for tables that grow quickly receiving a high number of inserts, creating
+indexes with a low fill factor can delay the need for node splits. Use a FILLFACTOR
+between 50 and 70% for indexes on tables that receive a very large number of inserts.
+
+-----------
+
+URL : http://publib.boulder.ibm.com/infocenter/idshelp/v10/index.jsp?topic=/com.ibm.dba.doc/dba109.htm
+
+Column Index Fill Factor
+Use the ADD FILL FACTOR PERCENTAGE screen, as Figure 51 shows, to set the fill-factor percentage 
+when you create an index on a single column. The index column has fill factor 
+and Unique or Dups abbreviated to U or D. 
+
+
+------------------------------------------------------------------------------------------------ 
+
+URL : Errors List And solving 
+http://www.oninit.com/errorcode/index.php?pageid=-623
+http://www.oninit.com/errorcode/index.php?pageid=-625
+
+
+------------------------------------------------------------------------------------------------ 
+
+Important Note:
+after dbexport if u already connect to the database by powerBuilder
+u have to delete all tables that related to powerbuilder like pbcat* from sql file
+then run dbimport
+
+
+------------------------------------------------------------------------------------------------ 
+
+<IBM informix dynamic server>\11.50\etc
+ONCONFIG.ol_server file ?????
+
+LOCKS = No of Users(number of connections) * 1000
+
+NETTYPE <soctcp||ipcshm>,<3(means 3 cpu)>
+                              ,<number of connections/thread>
+                              ,(NET(network)|CPU)
+
+SHMVIRTSIZE = 1024 * No of Users(number of connections) + 32656
+
+
+------------------------------------------------------------------------------------------------ 
+
+Admin Guid
+http://www.syncframe.de/download/Administrators_Guide_IBM.pdf
+
+------------------------------------------------------------------------------------------------ 
+
+How to calculate and set extent size and next extent size
+----------------------------------------------------------
+you can set sizes from dbaccess wizard or as sql statemnts create and alter
+
+Row Size = no of bytes for each column
+		char(25) -->> 25 byte
+		.
+		.	
+		.
+
+first extent = (No of Rows * Row Size) / 1024
+next extent  = (no of inserted rows per month * Row Size) / 1024
+
+------------------------------------------------------------------------------------------------ 
+Installation On Linux
+----------------------
+First install Linux by 
+1: open shell
+2: cd <path of informix folder>
+3: ./ids_install -gui
+4: go through wizard to finish the installation
+
+Second create file call it ol_server.cmd (the content of file will be differ according to operating system)
+like this:
+export INFORMIXSERVER=ol_server
+export INFORMIXDIR="/opt/IBM/informix"
+export ONCONFIG=onconfig.ol_server
+export INFORMIXSQLHOSTS=$INFORMIXDIR/etc/sqlhosts
+export PATH=${INFORMIXDIR}/bin:${PATH}:$HOME/bin
+export LD_LIBRARY_PATH=$INFORMIXDIR/lib:$INFORMIXDIR/lib/esql:$INFORMIXDIR/lib/tools
+export CLIENT_LOCALE=ar_ae.1256
+export DB_LOCALE=ar_ae.1256
+export TERMCAP=$INFORMIXDIR/etc/termcap
+
+Third go to <informix istallation directory>/etc
+      then copy file that called oncofig.std
+      then rename it as onconfig.ol_server 
+      then edite in file to firstly write the name of the server ->>(in our case) ol_server
+      then change the protocol from ipcshm to soctcp	
+      then create folder like /IFXMDATA/ol_server and create file called rootdbs_dat.000
+      then edit this new path in the onconfig.ol_server file	
+
+Install ol_server Steps
+-----------------------
+First go to /etc         --->>>> C:\Windows\System32\drivers\etc
+      open file services  
+      edite in the last line -->> turbo 1256/tcp #"Your Not Goes Here"
+
+Second go to /etc    
+       open file hosts
+       edite in the last line for example-->> 192.168.0.222 hanyLinux
+OR you can do this second step using Network menu from system -> administration menu
+
+Third got to <informix istallation directory>/etc
+      then sqlhosts add this line -->> ol_server	onsoctcp	hanyLinux	turbo 
+
+Initialize server for first time to run
+---------------------------------------
+First run file ol_server.cmd
+by open terminal then right sh <drag the file ol_server.cmd>
+
+if not work copy it's contents and paste in terminal
+to test it right echo $INFORMIXSQLHOSTS or any variable in this file 
+
+then
+
+oninit -ivy
+
+if there are an error not mentiond in this command 
+run onstat -m
+
+now you can use onmonitor utility to do all setup steps for that server
+this utility is 4gl program so run only on linux, unix, and AIX
+
+
+       
+		 

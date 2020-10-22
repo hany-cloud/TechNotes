@@ -1,0 +1,555 @@
+Lessons learned
+----------------
+	The Java Development Kit (JDK) is used to do software development. It contains the compiler (javac), which turns
+	source code into bytecode. It also contains the Java Virtual Machine (JVM) launcher (java), which launches the
+	JVM and then calls the code. Application programming interfaces (APIs) are available to call reusable pieces of
+	code.
+	Java code is object-oriented, meaning all code is defined in classes. Access modifiers allow classes to encapsulate
+	data. Java is platform independent, compiling to bytecode. It is robust and simple by not providing pointers or
+	operator overloading. Java is secure because it runs inside a virtual machine. Finally, the language facilitates
+	multithreaded programming and strives for backward compatibility.
+
+	Java begins program execution with a main() method. The most common signature for this method run from the
+	command line is public static void main(String[] args). Arguments are passed in after the class name, as in
+	java NameOfClass firstArgument.
+
+	Java Commenting
+	-----------------
+	- Single-line comment (//), a multiline comment (/* */), and a Javadoc comment (/** */).
+	
+	Import statement : helps you to use the class without package reference, Similarly the static import declaration imports static members 
+	-----------------  from classes and allowing them to be used without class reference.  
+	
+	- A wildcard ending an import statement means you want to import all classes in that package. 
+	  It does not include packages that are inside or sub-packages.
+	  In the event of a conflict, class name imports take precedence.
+	NOTE: we can add wildcard after class name in the import statement:
+			import aquarium.jellies.Jelly.*;
+		  but this doesn't mean anything with regular import statement, only it's used with static import.	
+			
+	NOTE: you don't need to import java.lang package, as well as you don't need to import the classes in the same package. 
+	
+	
+	Deprecation: is an indication that other code should be preferred. It doesn’t preclude or require eventual removal.
+	------------
+	So Deprecated features are never removed is incorecct statement.
+	
+	
+	Identifiers (Variables names) & Numeric literals (Numeric variables values) naming rules
+	-----------------------------------------------------------------------------------------
+	- Numeric literals (numeric variable values) may contain underscores between two digits and begin with 1–9, 0, 0x (hex), 0X (hex), 
+	  0b (binary), or 0B (binary), 0xE, and 1L (long), float f = 1.2f;
+	
+	More:
+	An integer literal may be expressed in decimal (base 10), hexadecimal (base 16), octal (base 8), or binary (base 2).
+	An octal numeral consists of an ASCII digit 0 followed by one or more of the ASCII digits 0 through 7 interspersed with underscores, 
+	and can represent a positive, zero, or negative integer.
+	
+	int i = 010; 
+	System.out.println(i); // prints 8 -> 010 = 1 * 8^1 + 0 * 8^0 = 8
+	
+	
+	- Identifiers may contain only letters, numbers (not as a first letter in the variable name), $, or _. 
+		i.e int 123 = 1;, or int 123_123 = 1; not correct, while int _123 = 1; is OK.
+		you cannot define an identifier that is just a single underscore character _.
+	
+	- Underscore represents in varaible names (Identifiers) and in the numeric variable values (numeric literals) too 
+		such as int _123 = 1_1/*is Ok as long as they are directly between two numbers.*/;
+		
+		
+	NOTE: Pay attention for the follwoing:
+			A. int amount = 9L; // incorrect because 9L is a long value. long amount = 9L would be allowed.
+			B. int amount = 0b101; /*OK, 0b is the prefix for a binary value and is correct.*/
+			C. int amount = 0xE; /* OK,
+									0x is the prefix for a hexadecimal value. 
+									This value can be assigned to many primitive types, 
+									including int and double
+								*/
+			D. double amount = 0xE // OK // too
+			
+			E. double amount = 1_2_.0_0; // incorrect because the underscore is immediately before the decimal.
+			F. int amount = 1_2_; // incorrect because the underscore is the very last character.
+			
+			G. double magic = 9___6; // OK
+	
+	Variables initialization
+	-------------------------
+	- Variables that represent fields in a class are automatically initialized to their corresponding
+	  “zero” or null value during object instantiation. Local variables must be specifically initialized.
+	  
+		NOTE: String fields in a class is initialized to null 
+
+	- Be able to use "var" keyword correctly in Local variables initialization
+		Local variables may use the var keyword instead of the actual type.
+		A var cannot be used for constructor parameters, method parameters, instance variables, or class variables.
+		
+		When using var, the type is set once at compile time and does not change.
+		A var is initialized on the same line where it is declared, and while it can change value, it cannot change type.
+		
+		A var cannot be initialized with a null value without a type but it can be assigned a null
+		value if the underlying type is not a primitive, nor can it be used in multiple variable declarations. 
+		
+		Finally, var is not a reserved word in Java and can be used as a variable name.
+
+	
+	finalize() method
+	------------------
+	- The finalize() method will run once for each object if/when it is first garbage collected.
+	
+	Java Features
+	---------------
+	- Java is platform independent, compiling to bytecode. It is robust and simple by not providing pointers or operator overloading.
+	- Java is secure because it runs inside a virtual machine.
+	
+	
+	Java Commands
+	--------------
+	1- Given the following command, which of the following classes would be included for compilation? (Choose all that apply.)
+	 javac *.java
+		A. Hyena.java
+		B. Warthog.java
+		C. land/Hyena.java
+		D. land/Warthog.java
+		E. Hyena.groovy
+		F. Warthog.groovy 
+	The wildcard is configured for files ending in .java, making options E and F incorrect.
+	Additionally, wildcards aren’t recursive, making options C and D incorrect. Therefore, options A and B
+	are correct.
+	
+	
+	2- Which of the following are true if this command completes successfully? (Choose all that apply.)
+	 java MyProgram.java
+		A. A .class file is created.
+		B. MyProgram can reference classes in the package com.sybex.book.
+		C. MyProgram can reference classes in the package java.lang.
+		D. MyProgram can reference classes in the package java.util.
+		E. None of the above. The program needs to be run as java MyProgram.
+	C, D. This example is using the single-file source-code launcher. It compiles in memory rather than
+	creating a .class file, making option A incorrect. To use this launcher, programs can only reference
+	classes built into the JDK. Therefore, option B is incorrect, and options C and D are correct.
+
+	3- javac (Compile) command options (without considering module options)
+		-cp : specify a classpath (Location of classes needed to compile the program)
+		-d  : specify a directory to place generated class files
+		
+	   java (Run) command option (without considering module options)	
+		-cp : specify a classpath (Location of classes needed to run the program)	   
+		
+				On Windows, you type the following:
+					java -cp ".;C:\temp\someOtherLocation;c:\temp\myJar.jar" myPackage.MyClass
+				And on macOS/Linux, you type this:
+					java -cp ".:/tmp/someOtherLocation:/tmp/myJar.jar" myPackage.MyClass
+		
+				The period (.) indicates you want to include the current directory in the classpath. The rest of the command says to
+				look for loose class files (or packages) in someOtherLocation and within myJar.jar. Windows uses semicolons (;)
+				to separate parts of the classpath; other operating systems use colons.
+				
+				Just like when you’re compiling, you can use a wildcard (*) to match all the JARs in a directory. Here’s an example:
+					java -cp "C:\temp\directoryWithJars\*" myPackage.MyClass
+				This command will add all the JARs to the classpath that are in directoryWithJars. It won’t include any JARs in
+				the classpath that are in a subdirectory of directoryWithJars.
+		
+	   jar command (Creating a JAR File) options (without considering module options)
+	    -cf or -cvf
+			jar -cvf myNewFile.jar
+			jar --create --verbose --file myNewFile.jar
+		Alternatively, you can specify a directory instead of using the current directory.
+			jar -cvf myNewFile.jar -C dir
+		
+		-cp : specify a classpath (Location of classes needed to compile the program)
+		-C  : specify a directory to place generated class files
+	
+	4- Which are valid ways to specify the classpath when compiling? (Choose all that apply.)
+			A. -cp
+			B. -classpath
+			C. --classpath
+			D. -class-path
+			E. --class-path	
+		A, B, E. Unfortunately, this is something you have to memorize. The code with the hyphenated word
+		class-path uses two dashes in front, making option E correct and option D incorrect. The reverse is
+		true for the unhyphenated classpath, making option B correct and option C incorrect. Finally, the
+		short form is option A.
+
+
+	Note: The Java Runtime Environment (JRE) was an option for older versions of Java, but it’s no longer a download option for Java 11.	
+==========================================================================================================
+==========================================================================================================	
+==========================================================================================================
+
+***1. Which of the following are valid Java identifiers? (Choose all that apply)
+	A. A$B
+	B. _helloWorld
+	C. true
+	D. java.lang
+	E. Public
+	F. 1980_s
+
+1. A, B, (E is correct because it starts with capital letter P, vert tricky option)
+------------------------------------------------------------------------------------
+***2. What is the output of the following program?
+	1: public class WaterBottle {
+	2: private String brand;
+	3: private boolean empty;
+	4: public static void main(String[] args) {
+	5: 	WaterBottle wb = new WaterBottle();
+	6: 	System.out.print("Empty = " + wb.empty);
+	7: 	System.out.print(", Brand = " + wb.brand);
+	8: } }
+	A. Line 6 generates a compiler error.
+	B. Line 7 generates a compiler error.
+	C. There is no output.
+	D. Empty = false, Brand = null
+	E. Empty = false, Brand =
+	F. Empty = null, Brand = null
+	
+2. D
+------------------------------------------------------------------------------------
+3. Which of the following are true? (Choose all that apply)
+	4: short numPets = 5;
+	5: int numGrains = 5.6;
+	6: String name = "Scruffy";
+	7: numPets.length();
+	8: numGrains.length();
+	9: name.length();
+	A. Line 4 generates a compiler error.
+	B. Line 5 generates a compiler error.
+	C. Line 6 generates a compiler error.
+	D. Line 7 generates a compiler error.
+	E. Line 8 generates a compiler error.
+	F. Line 9 generates a compiler error.
+	G. The code compiles as is.
+	
+3. B, D, E 	
+------------------------------------------------------------------------------------
+4. Given the following class, which of the following is true? (Choose all that apply)
+	1: public class Snake {
+	2:
+	3: public void shed(boolean time) {
+	4:
+	5: 	if (time) {
+	6:
+	7: 	}
+	8: 	System.out.println(result);
+	9:
+	10: }
+	11: }
+	A. If String result = "done"; is inserted on line 2, the code will compile.
+	B. If String result = "done"; is inserted on line 4, the code will compile.
+	C. If String result = "done"; is inserted on line 6, the code will compile.
+	D. If String result = "done"; is inserted on line 9, the code will compile.
+	E. None of the above changes will make the code compile.
+
+4. A, B
+------------------------------------------------------------------------------------
+5. Given the following classes, which of the following can independently replace INSERT
+   IMPORTS HERE to make the code compile? (Choose all that apply)
+	package aquarium;
+	public class Tank { }
+	
+	package aquarium.jellies;
+	public class Jelly { }
+	
+	package visitor;
+	INSERT IMPORTS HERE
+	public class AquariumVisitor {
+		public void admire(Jelly jelly) { } }
+	A. import aquarium.*;
+	B. import aquarium.*.Jelly;
+	C. import aquarium.jellies.Jelly;
+	D. import aquarium.jellies.*;
+	E. import aquarium.jellies.Jelly.*;
+	F. None of these can make the code compile.
+
+5. C, D, (E  Option E is incorrect because you import only parts of a class Jelly and not the whole class.)
+------------------------------------------------------------------------------------
+6. Given the following classes, what is the maximum number of imports that can be removed
+   and have the code still compile?
+	package aquarium; public class Water { }
+	
+	package aquarium;
+	import java.lang.*;
+	import java.lang.System;
+	import aquarium.Water;
+	import aquarium.*;
+	public class Tank {
+		public void print(Water water) {
+		System.out.println(water); } }
+	A. 0
+	B. 1
+	C. 2
+	D. 3
+	E. 4
+	F. Does not compile.
+	
+6. E
+------------------------------------------------------------------------------------
+7. Given the following classes, which of the following snippets can be inserted in place of
+   INSERT IMPORTS HERE and have the code compile? (Choose all that apply)
+	package aquarium;
+	public class Water {
+		boolean salty = false;
+	}
+	package aquarium.jellies;
+	public class Water {
+		boolean salty = true;
+	}
+	package employee;
+	INSERT IMPORTS HERE
+	public class WaterFiller {
+		Water water;
+	}
+	A. import aquarium.*;
+	B. import aquarium.Water;
+	   import aquarium.jellies.*;
+	C. import aquarium.*;
+	   import aquarium.jellies.Water;
+	D. import aquarium.*;
+	   import aquarium.jellies.*;
+	E. import aquarium.Water;
+	   import aquarium.jellies.Water;
+	F. None of these imports can make the code compile.
+	
+7. A, B, C 
+------------------------------------------------------------------------------------
+8. Given the following class, which of the following calls print out Blue Jay? (Choose all that apply)
+	public class BirdDisplay {
+		public static void main(String[] name) {
+			System.out.println(name[1]);
+	} }
+	A. java BirdDisplay Sparrow Blue Jay
+	B. java BirdDisplay Sparrow "Blue Jay"
+	C. java BirdDisplay Blue Jay Sparrow
+	D. java BirdDisplay "Blue Jay" Sparrow
+	E. java BirdDisplay.class Sparrow "Blue Jay"
+	F. java BirdDisplay.class "Blue Jay" Sparrow
+	G. Does not compile.
+	
+8. B	
+------------------------------------------------------------------------------------
+9. Which of the following legally fill in the blank so you can run the main() method from the
+   command line? (Choose all that apply)
+	public static void main(________)
+	A. String[] _names
+	B. String[] 123
+	C. String abc[]
+	D. String _Names[]
+	E. String... $n
+	F. String names
+	G. None of the above.
+
+9. A, C, D, E
+------------------------------------------------------------------------------------
+10. Which of the following are legal entry point methods that can be run from the command
+    line? (Choose all that apply)
+	A. private static void main(String[] args)
+	B. public static final main(String[] args)
+	C. public void main(String[] args)
+	D. public static void test(String[] args)
+	E. public static void main(String[] args)
+	F. public static main(String[] args)
+	G. None of the above.
+
+10. E
+------------------------------------------------------------------------------------	
+11. Which of the following are true? (Choose all that apply)
+	A. An instance variable of type double defaults to null.
+	B. An instance variable of type int defaults to null.
+	C. An instance variable of type String defaults to null.
+	D. An instance variable of type double defaults to 0.0.
+	E. An instance variable of type int defaults to 0.0.
+	F. An instance variable of type String defaults to 0.0.
+	G. None of the above.
+
+11. C, D
+------------------------------------------------------------------------------------
+12. Which of the following are true? (Choose all that apply)
+	A. A local variable of type boolean defaults to null.
+	B. A local variable of type float defaults to 0.
+	C. A local variable of type Object defaults to null.
+	D. A local variable of type boolean defaults to false.
+	E. A local variable of type boolean defaults to true.
+	F. A local variable of type float defaults to 0.0.
+	G. None of the above.
+
+12. G
+------------------------------------------------------------------------------------
+13. Which of the following are true? (Choose all that apply)
+	A. An instance variable of type boolean defaults to false.
+	B. An instance variable of type boolean defaults to true.
+	C. An instance variable of type boolean defaults to null.
+	D. An instance variable of type int defaults to 0.
+	E. An instance variable of type int defaults to 0.0.
+	F. An instance variable of type int defaults to null.
+	G. None of the above.
+
+13. A, D 
+------------------------------------------------------------------------------------
+14. Given the following class in the file /my/directory/named/A/Bird.java:
+	INSERT CODE HERE
+	public class Bird { }
+	
+	Which of the following replaces INSERT CODE HERE if we compile from /my/directory?
+	(Choose all that apply)
+	A. package my.directory.named.a;
+	B. package my.directory.named.A;
+	C. package named.a;
+	D. package named.A;
+	E. package a;
+	F. package A;
+	G. Does not compile.  
+
+14. D
+------------------------------------------------------------------------------------
+15. Which of the following lines of code compile? (Choose all that apply)
+	A. int i1 = 1_234;
+	B. double d1 = 1_234_.0;
+	C. double d2 = 1_234._0;
+	D. double d3 = 1_234.0_;
+	E. double d4 = 1_234.0;
+	F. None of the above.
+
+15. A, E
+------------------------------------------------------------------------------------
+***16. Given the following class, which of the following lines of code can replace INSERT CODE
+	HERE to make the code compile? (Choose all that apply)
+	public class Price {
+		public void admission() {
+			INSERT CODE HERE
+			System.out.println(amount);
+		} }
+	A. int amount = 9L;
+	B. int amount = 0b101;
+	C. int amount = 0xE;
+	D. double amount = 0xE;
+	E. double amount = 1_2_.0_0;
+	F. int amount = 1_2_;
+	G. None of the above.	
+	
+**********16. B, D	
+16. B, C, D. 
+- 0b is the prefix for a binary value and is correct. 
+- 0x is the prefix for a hexadecimal value. This value can be assigned to many primitive types, including int and
+  double, making options C and D correct. 
+- Option A is incorrect because 9L is a long value. long amount = 9L would be allowed.
+
+- Option E is incorrect because the underscore is immediately before the decimal. 
+- Option F is incorrect because the underscore is the very last character.
+------------------------------------------------------------------------------------
+17. Which of the following are true? (Choose all that apply)
+	public class Bunny {
+		public static void main(String[] args) {
+			Bunny bun = new Bunny();
+	} }
+	A. Bunny is a class.
+	B. bun is a class.
+	C. main is a class.
+	D. Bunny is a reference to an object.
+	E. bun is a reference to an object.
+	F. main is a reference to an object.
+	G. None of the above.
+	
+17. A, E
+------------------------------------------------------------------------------------
+18. Which represent the order in which the following statements can be assembled into a program
+	that will compile successfully? (Choose all that apply)
+	A: class Rabbit {}
+	B: import java.util.*;
+	C: package animals;
+	A. A, B, C
+	B. B, C, A
+	C. C, B, A
+	D. B, A
+	E. C, A
+	F. A, C
+	G. A, B	
+	
+18. C, D, E	
+------------------------------------------------------------------------------------
+***19. Suppose we have a class named Rabbit. Which of the following statements are true?
+	(Choose all that apply)
+	1: public class Rabbit {
+	2: 	public static void main(String[] args) {
+	3: 		Rabbit one = new Rabbit();
+	4: 		Rabbit two = new Rabbit();
+	5: 		Rabbit three = one;
+	6: 		one = null;
+	7: 		Rabbit four = one;
+	8: 		three = null;
+	9: 		two = null;
+	10: 	two = new Rabbit();
+	11: 	System.gc();
+	12: } }
+	A. The Rabbit object from line 3 is first eligible for garbage collection immediately
+	   following line 6.
+	B. The Rabbit object from line 3 is first eligible for garbage collection immediately
+	   following line 8.
+	C. The Rabbit object from line 3 is first eligible for garbage collection immediately
+	   following line 12.
+	D. The Rabbit object from line 4 is first eligible for garbage collection immediately
+	   following line 9.
+	E. The Rabbit object from line 4 is first eligible for garbage collection immediately
+	   following line 11.
+	F. The Rabbit object from line 4 is first eligible for garbage collection immediately
+	   following line 12.
+
+19. C, D
+B, D
+------------------------------------------------------------------------------------
+20. What is true about the following code? (Choose all that apply)
+	public class Bear {
+		protected void finalize() {
+			System.out.println("Roar!");
+		}
+		public static void main(String[] args) {
+			Bear bear = new Bear();
+			bear = null;
+			System.gc();
+	} }
+	A. finalize() is guaranteed to be called.
+	B. finalize() might or might not be called
+	C. finalize() is guaranteed not to be called.
+	D. Garbage collection is guaranteed to run.
+	E. Garbage collection might or might not run.
+	F. Garbage collection is guaranteed not to run.
+	G. The code does not compile.	   
+	
+20. B, E
+------------------------------------------------------------------------------------
+21. What does the following code output?
+	1: public class Salmon {
+	2: 	int count;
+	3: 	public void Salmon() {
+	4: 		count = 4;
+	5: 	}
+	6: 	public static void main(String[] args) {
+	7: 		Salmon s = new Salmon();
+	8: 		System.out.println(s.count);
+	9: } }
+	A. 0
+	B. 4
+	C. Compilation fails on line 3.
+	D. Compilation fails on line 4.
+	E. Compilation fails on line 7.
+	F. Compilation fails on line 8.
+
+21. A
+------------------------------------------------------------------------------------
+22. Which of the following are true statements? (Choose all that apply)
+	A. Java allows operator overloading.
+	B. Java code compiled on Windows can run on Linux.
+	C. Java has pointers to specific locations in memory.
+	D. Java is a procedural language.
+	E. Java is an object-oriented language.
+	F. Java is a functional programming language.
+
+22. B, E
+------------------------------------------------------------------------------------
+23. Which of the following are true? (Choose all that apply)
+	A. javac compiles a .class file into a .java file.
+	B. javac compiles a .java file into a .bytecode file.
+	C. javac compiles a .java file into a .class file.
+	D. Java takes the name of the class as a parameter.
+	E. Java takes the name of the .bytecode file as a parameter.
+	F. Java takes the name of the .class file as a parameter.
+
+23. C, D	

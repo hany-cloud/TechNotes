@@ -1,0 +1,290 @@
+H0wT0
+------
+1- How to save a PDF electronic form after fill it, on any browser.
+	On the page/tab in your current browser for the PDF file > click ctrl+p buttons on your keyboard then based on your browser do the follwoing: 
+		On Google chrom
+			from "Destination" drop down list > select "Save as PDF" option. 
+		On Microsoft Edge 
+			from "Printer" drop down list > select "Microsoft Print to PDF" option. 
+		On Microsoft Internet Explorer (IE*)
+			from frame "Select Printer" > select "Microsoft Print to PDF" option. 
+			
+2- How to change the language that is used in the project for a repository on GitHub?
+	First of all, you need to know that the tool GitHub uses to analyse the language in your code is called linguist.
+	This language counts the total bytes of each language's file (using the file extension) to decide the percentages of each used language in your project. 
+	And to override the default behavoiur of this language, you can add a .gitattributes file in the root of your repository folder.	
+	And then you can add one or more from the follwoing commands in the file depending on your case:
+	
+		1- ignore part of your project (mark it as not considered for language detection process):
+			[folderName]/* linguist-vendored
+	
+		2- ignore some file extensions:
+			*.js linguist-vendored=false
+	
+		3- consider part of your project as documentation:
+			[folderName]/* linguist-documentation
+
+		4- indicate some files with specific extension (for instance *.cshtml) should be considered a specific language:
+			*.cshtml linguist-language=C#
+			
+		5- To Install the latest version of Angular CLI
+			First, you need to install the latest version of NodeJs. Normally on windows it is suggest an exe file to run.
+				and this file will remove the old version o fnode js automatically and install the new version.
+			Then, npm is a separate project from Node.js, and tends to update more frequently. As a result, 
+				even if you’ve just downloaded Node.js (and therefore npm), you’ll probably need to update your npm. 
+				Luckily, npm knows how to update itself! To update your npm, type this into your terminal:
+
+					npm install npm@latest -g
+					
+			Lastly, To install or update Angular CLI, type this command in the Terminal or Node Command Line.
+					
+					npm install -g @angular/cli
+				
+				Sometimes if the Angular failed to installed add --force to the command 	
+					
+					npm install -g @angular/cli --force
+					
+				The Angular CLI is a command-line interface tool that you use to initialize, develop, scaffold, and maintain Angular applications.
+				
+			Note: to use the terminal, you need to open CMD on windows the write the follwoing:
+					
+					cd [NodeJs_INSTALLED_PATH] 	
+							ie. cd "C:\Program Files\nodejs\v12.16.1\"
+					
+					And to check on the versions type: 
+							node -v
+					Then 
+							npm -v
+					And
+							ng --version
+					
+			
+			Now you are ready to use Angular CLI
+			
+			Let's use below command to generate an Angular Client application. We name this project as "angular9-springboot-client".
+						
+						ng new angular9-springboot-client
+						
+			Create Service & Components using Angular CLI
+				First, go to your project location path
+						i.e. 
+							cd C:\My Space\My Work\workplace-j2ee\employeemanagment-jpa-crud-angular8\
+				Next,  create a new Angular app by running this command.			
+							
+							ng new [YOUR_APP_NAME]
+								i.e. ng new angular-springboot-client
+							
+				Then, run 
+						
+						cd [YOUR_APP_NAME]\src\app
+							
+				
+				Finally, Run the following commands		
+						- ng g s employee
+						– ng g c create-employee
+						– ng g c employee-details
+						– ng g c employee-list
+						
+			Integrate JQuery and Bootstrap with Angular
+					npm install bootstrap jquery --save
+					
+					You can the find the rest of steps in the following link:
+							https://www.javaguides.net/2019/06/spring-boot-angular-8-crud-part-2-create-angular-8-app.html
+		
+			To run the project, compile the code and launch it in a browser 
+				ng serve --open
+				
+			To listen on a specific port (this port can be custom):
+				C:\angular-project\[YOUR_APP_NAME]> ng serve --port 333 -o	
+				ng serve --port 333 -o
+				
+3- How can I get the “Eclipse >Generate>Jaxb classes” option back? In STS too
+https://stackoverflow.com/questions/6939299/how-can-i-get-the-eclipse-generatejaxb-classes-option-back
+The above methods may work, but actually the options comes from a plugin called Web Tools Platform which comes along with Eclipse IDE for Java EE Developers.
+
+Don't worry about reinstalling eclipse or try out other methods. No matter what eclipse you use simply install this plugin by following the below procedure. 
+You will get the "JAXB Classes" Option on click of "Generate" button.
+
+> Help --> Install New Software --> Add
+
+	Name : Web Tools Platform
+	Location : http://download.eclipse.org/webtools/repository/helios
+
+Then you need to add the following dependency in your pom.xml file
+<dependency>
+	<groupId>com.sun.xml.bind</groupId>
+	<artifactId>jaxb-xjc</artifactId>
+	<version>${jaxb-xjc.version}</version>
+</dependency>
+				
+H0wT0Fix
+---------
+1- How to fix youtube signing in issue "Sorry, something went wrong! Our tubes must be clogged".
+	On Google chrome
+	Go to Settings > search on "cookies" > click on "Site Settings" > Under "Permissions", click on "Cookies and site data" > 
+		Under "Block", use the more actions drop down list to remove youtube from that list.([*.]youtube.com)
+
+2- How to fix master:master [rejected – non-fast-forward]
+http://www.hoverdroids.com/errors/egit/eclipse-github-push-error-mastermaster-rejected-non-fast-forward/
+	If you are a nube to Git, which I certainly am, you have no clue what this means, why it’s happening, or how to fix it. 
+	Also, if you’ve traveled down the same path I have, then you’ve encountered this message after one of the following scenarios:
+
+	Used EGit in Eclipse to connect a local repository to an already created repository on GitHub. After setting correct SSH and then trying to push, 
+	you get said message.
+	Local repository has been pushing to remote repository on GitHub forever and randomly crapped out with the message.
+	If so, then the problem is most likely that your local and remote repositories are out of sync, and there’s a conflict between some files. 
+	Follow the procedure below to resolve this problem.
+
+	First, make sure the most recent changes have been committed. To do this, in Eclipse, right-click on the application’s folder->Team->Commit. If a pop-up does not say “Up-to-date”, then finish committing the current changes to the local repository. If it’s already up-to-date, continue.
+	Try to pull from the remote repository to the local repository; then push to it. To do this, in Eclipse, right-click on the application’s folder->Team->Fetch From Upstream. If you were able to pull, then push by right-click on the application’s folder->Team->Fetch From Upstream. If unable to pull because of an error, then continue.
+	At this point, I had to force a push from my local repository to remote repository on Github. Forcing a push will override any changes on Github with the changes from your local repository! If this is not your goal, DON’T CONTINUE. If it is your goal then do the following:
+	Right-click on application’s Folder->Team->Remote->Configure Push To Upstream
+	Configuration dialog will pop-up->Under “Ref mapping” hit “Advanced” button
+	Push Ref Specifications will pop-up->Select “master [branch]” under “Source Ref” and “Destination Ref”
+	In same window select “add spec”
+	You should now see this update in the “Specifications for push” window; select “Force Push” next to it
+	Select “Finish”
+	At this point my problem was fixed, but I also didn’t care about throwing away changes on GitHub. If you are concerned about this, please keep Googleing because I don’t know how to fix it.			
+	
+3- How to fix Deployment error:Starting of Tomcat failed, the server port 8080 is already in use
+	> View the current process Id that is using your port 
+		for windows: goto command prompt CMD then run:
+			netstat -aon
+
+		for linux
+			netstat -tulpn | grep 'your_port_number'
+	
+	
+	> It will show you something like
+		TCP    192.1.200.48:8080      209.85.153.100:80      ESTABLISHED     248
+	
+	> To kill the process
+		On Linux:
+			kill -9 248
+		On Windows:
+			taskkill /f /pid 248
+
+4- How to fix spring boot doesn't display my resources issue.
+	https://stackoverflow.com/questions/24661289/spring-boot-not-serving-static-content
+	The simple solution was to have my configuration class extend WebMvcAutoConfiguration:
+
+		@Configuration
+		@EnableWebMvc
+		@ComponentScan
+		public class SpringWebConfig extends WebMvcAutoConfiguration {
+	
+	This solution is perfect in case if you don't need to define any formatters or conversions.
+	But in case you need to define formatters or converters, you need to do the follwoing two steps:
+	First: In your configuration class extend WebMvcAutoConfiguration and implement the interface WebMvcConfigurer.
+		@Configuration
+		@EnableWebMvc
+		@ComponentScan
+		public class SpringWebConfig extends WebMvcAutoConfiguration implements WebMvcConfigurer {
+			.
+			.
+			.
+			/*
+			 * Add formatter for class {@link
+			 * thymeleafexamples.stsm.business.entities.Variety} and {@link java.util.Date}
+			 * in addition to the one registered by default
+			 */
+			@Override
+			public void addFormatters(final FormatterRegistry registry) {
+				registry.addFormatter(varietyFormatter());				
+			}
+
+			@Bean
+			public VarietyFormatter varietyFormatter() {
+				.....
+			}
+			
+			.
+			.
+			.
+		}	
+		
+		Example for converters
+			public class StringToEmployeeConverter
+			  implements Converter<String, Employee> {
+			 
+				@Override
+				public Employee convert(String from) {
+					String[] data = from.split(",");
+					return new Employee(
+					  Long.parseLong(data[0]), 
+					  Double.parseDouble(data[1]));
+				}
+			}
+
+		Example for formatters
+			public class DateFormatter implements Formatter<Date> {
+				@Autowired
+				private MessageSource messageSource;
+
+
+				public DateFormatter() {
+					super();
+				}
+
+				public Date parse(final String text, final Locale locale) throws ParseException {
+					final SimpleDateFormat dateFormat = createDateFormat(locale);
+					return dateFormat.parse(text);
+				}
+
+				public String print(final Date object, final Locale locale) {
+					final SimpleDateFormat dateFormat = createDateFormat(locale);
+					return dateFormat.format(object);
+				}
+
+				private SimpleDateFormat createDateFormat(final Locale locale) {
+					final String format = this.messageSource.getMessage("date.format", null, locale);
+					final SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+					dateFormat.setLenient(false);
+					return dateFormat;
+				}
+			}
+	
+	
+	Second: in your application.properties add the follwoing line:
+		#### Spring Boot Properties
+
+		## Solve spring boot not serving static content
+		spring.main.allow-bean-definition-overriding=true
+
+
+5- Solve spring boot not throwing NoHandlerFoundException
+https://github.com/spring-projects/spring-boot/issues/9263
+What happen is:
+The NoHandlerFoundException is thrown when no HandlerMapping has been found; 
+HandlerMapping as in RequestMappingHandlerMapping or SimpleHandlerMapping, not as "an annotated controller method that handles the request".
+
+In default case with no entry in application.properties that handle the resources or if you add the follwoing lines:
+	spring.mvc.throw-exception-if-no-handler-found=true
+	spring.mvc.static-path-pattern=/**
+	spring.resources.static-locations=classpath:/static/ 
+When an incoming request comes in at "/something" and no controller handler is detected with RequestMappingHandlerMapping, 
+the next registered HandlerMapping instances are considered. 
+Since you've registered static resource handling on /**, this means that it will handle /**, so the NoHandlerFoundException will never be thrown.
+
+Now the static resources handling might respond with an HTTP 404, but this is an expected response for such a handler. 
+Either the static resource is there and we respond with it, or we respond with a 404.
+
+Now let say you have your static resources such as css, images, js folders under "static" folder, 
+In your application.properties add the follwoing lines: 
+	spring.mvc.throw-exception-if-no-handler-found=true
+	spring.mvc.static-path-pattern=/resources/**
+	spring.resources.static-locations=classpath:/static/
+	
+And in your Thymeleaf page you can do somthing like:
+	<link rel="stylesheet" type="text/css" media="all" href="../../css/stsm.css" th:href="@{/resources/css/stsm.css}"/>
+
+And in your JSP page you can do somthing like:		
+	<spring:url var="css" value="/resources/css" />
+	.
+	.
+	.
+	<link href="${css}/bootstrap.min.css" rel="stylesheet">
+	
+	
+6- How to solve class "org.hamcrest.Matchers"'s signer information does not match signer information of other classes in the same package
+   In my case I was using Junit 5 but I was had a Junit4 jar too in my buioding class path, so all what I was need is to remove this jar from my project.	

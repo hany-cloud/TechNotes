@@ -1,0 +1,761 @@
+================================================================================================================================================
+																Java OOP
+															------------------
+================================================================================================================================================
+Is Java a pure object-oriented language? if not why? No
+	There are many things you can do without objects e.g. static methods. Also, primitive variables are not objects in Java.
+
+
+Method signature: means the number and type of arguments.
+
+
+What are the rules of method overloading and overriding in Java?
+		Method overloading: the method signature should be different i.e. either the number of arguments or the type of arguments. 
+							Simply changing the return type of two methods will not result in overloading, 
+							instead, the compiler will throw an error. 
+		On the other hand, 
+		Method overriding: has more rules e.g. name and return type must be the same, method signature should also be the same, 
+						   the overloaded method cannot throw a higher checked exception.
+
+
+	The difference between method overloading and overriding?
+		Method overloading is resolved at compile-time. 
+		Method overriding is resolved at runtime. 
+		The compiler only used the class information for method overloading, but it needs to know the object (reference variable of type superclass/subclass) 
+		to resolve overridden method calls.
+
+	What is the difference between Polymorphism, Overloading, and Overriding?
+		Polymorphism is the real concept behind on both Overloading and Overriding. 
+		Overloading is compiled time Polymorphism and Overriding is Runtime Polymorphism.
+
+
+	Can we overload a static method in Java? Yes
+	Can we override the static method in Java? No
+		No, you cannot override a static method because it's not bounded to an object. Instead, 
+		static methods belong to a class and resolved at compile time using the type of reference variable. 
+		But, Yes, you can declare the same static method in a subclass, that will result in method hiding 
+		i.e. if you use the reference variable of type subclass then new method will be called, 
+		but if you use the reference variable of type superclass then old method will be called.
+		
+	Can we prevent overriding a method without using the final modifier? Yes, By marking the method private or static	
+
+	Can we override a private method in Java? No,But, you can override them inside the inner class as they are accessible there.
+	******Tricky
+			public class Parent {
+				private void overridedMethod() {
+					System.out.println("Parent private method is called!!!");
+				}
+				
+				class InnerChild extends Parent {
+					private void method() {
+						System.out.println("InnerChild private method is called!!!");
+					}
+				}
+				
+				public static void main(String[] args) {
+					Parent p = new Parent();
+					Parent.InnerChild innerChild = p.new InnerChild();
+						--------------	
+					innerChild.method(); // w/o Parent.InnerChild, it will call the parent method
+								
+					Parent child = new Child(1); // Child is another class extends Parent class
+					child.overridedMethod(); // will call always the parent method, because the parent method is declared private method 			
+				}
+			}
+	
+	What is the Covariant method overriding in Java? OR 
+	Can we change the return type of method to subclass while overriding?
+			the overriding method can return the subclass of the object returned by the original or overridden method. 
+			It's very helpful in case the original method is returning general type like Object class, because, 
+			then by using the covariant method overriding you can return a more suitable object and prevent client-side typecasting. 
+			One of the practical use of this concept is when you override the "clone()" method in Java.
+			
+	Can we change the argument list of an overriding method? No
+	Can we override a method that throws runtime exception without throws clause? Yes
+		But in the case of checked exception, an overriding exception cannot throw a checked exception which comes higher in type hierarchy 
+		e.g. if the original method is throwing IOException than the overriding method cannot throw java.lang.Exception or java.lang.Throwable.
+	How do you call a superclass version of an overriding method in a subclass? Using super keyword.
+	
+	*****Can we Reducing the visibility by access modifiers for overriding method? 
+		No, Cannot reduce the visibility of the inherited method from Parent class (it will give a compiler error)
+		i.e if the overridden method in Parent class is declared as "public", the overriding method cannot be protected, default, or private.
+	
+	Can we override the final method in Java? No, 
+		You use the final when you don't want subclass changing the logic of your method by overriding it due to Immutability, or Security reasons. 
+		This is why the "String" class is final in Java. 
+		This concept is also used in the "Template Design Pattern" where the template method is made final to prevent overriding.
+
+	
+	****TRICKY****
+	Can we override a non-static method as static in Java? No, (it will give a compiler error)
+	
+		
+What are differences between Abstract class and Interface?
+	Both are there to specify the contract of an API and to support the OOP "Abstraction" Concept as they define only abstract behavior 
+	and will tell that your program will give output but how is left to implementors.
+	
+	And since both of them need to be extended or implemented, so you can accomplish the "Polymorphism" OOP concept using both of them.
+	Althogh both of them can exist without declaring any abstract methods.
+	
+	The key defirences espicially after Java8, are the constructors and variables declaration
+	constructors can be introduced only in Abstract classes
+	And variables by default are public, static, and final in the interface.
+	
+	Constructor Chain
+		Once you have constructors declared in parent and child classes, you have to call the parent constructor from one of the child constructors.
+				// Wrong Code
+				protected int var1;
+				Parent(int var1) {
+					this.var1 = var1;
+				}
+				Parent() {										Parent() {			
+					super(2);										this(2); 
+					this(2); // complie error						super(2); // complie error, TOO
+				}												}
+				
+				// Coorect Code
+				protected int var1;
+				Parent(int var1) {
+					super(1);
+					this.var1 = var1;
+				}
+				
+				Parent() {
+					this(2);		
+				}
+
+Can an interface extend more than one interface in Java? Yes, an interface can extend more than one interface
+	
+================================================================================================================================================
+https://javarevisited.blogspot.com/2018/07/10-object-oriented-design-principles.html
+
+																OOP Design 
+															Design Principle (SOLID)
+														-------------------------------
+================================================================================================================================================
+OOP Design
+-----------	
+	What is the difference between Association, Aggregation, and Composition in OOP?
+		When an object is related to another object is called association. 
+		It has two forms, aggregation, and composition. 
+		Aggregation is the loose form of Association where the related object can survive individually. 
+		while Composition is a stronger form of Association where a related object cannot survive individually. 
+		For example, the "city" is an Aggregation of "people" but "people" is the Composition of "body parts".
+
+	What is the difference between Composition and Inheritance in OOP?
+		Both of them are very important from a class design perspective. Though both Composition and Inheritance allows you to reuse code, 
+		formerly Composition is more flexible than later. Composition allows the class to get an additional feature at runtime, 
+		but Inheritance is static. You can not change the feature at runtime by substitution of a new implementation.
+		
+	What is the difference between Abstraction and Polymorphism in OOP and Java?
+		Abstraction generalizes the concept 
+			Abstraction is a process of hiding the implementation details from the user. Оnly the functionality will be provided to the user. 
+			In Java, abstraction is achieved using abstract classes and interfaces.
+		Polymorphism allows you to use different implementation without changing your code.
+			Or by other mean is the ability of an object to take on many forms.
+			Polymorphism occurs when a parent class reference is used to refer to a child class object.
+	
+	What is Encapsulation in OOP and Java? 
+		The variables and Methods of a class will be hidden from other classes, and can be accessed only through the methods of their current class. 
+		Therefore, it is also known as data hiding. 
+		Such as declaring the variables of a class as private. Provide public setter and getter methods to modify and view the variables values.
+		And in design we always aim to "Encapsulate What Changes".	
+
+
+Object-Oriented Design Principles
+----------------------------------
+	1. DRY (Don't repeat yourself)
+		Means don't write duplicate code, instead use Abstraction to abstract common things in one place.
+		Although It means if you used standard code to validate OrderID and SSN, you tightly couple them forever, while they are different in nature.
+
+	2. Encapsulate What Changes
+		Means encapsulate the code you expect or suspect to be changed in the future. 
+		The benefit is, It's easy to test and maintain proper the encapsulated code.
+		
+		You can apply this priciple in Java 
+		By making variable and methods private by default and increasing access step by step, e.g. from private to protected and not public.
+
+		> The Factory design pattern is one example of Encapsulation which encapsulates object creation code.
+	
+	3. Open Closed Design Principle ("O" In SOLID)
+		Means Classes, methods, or functions should be Open for extension (new functionality) and Closed for modification.
+		This prevents someone from changing already tried and tested code.
+		
+		> The Strategy design Pattern is one example of Open Closed Design principle.
+		> The State design Pattern
+		> The Decorator design Pattern is also another example of Open Closed Design principle.
+		> The Template Method design Pattern.
+	
+	4. Single Responsibility Principle (SRP) ("S" In SOLID)
+		Means there should not be more than one reason for a class, or a class should always handle single functionality.
+		If you put more than one functionality in one Class, it introduces coupling between two functionality, 
+			and even if you change one feature, there is a chance you broke coupled functionality, which requires another round of testing.
+
+	5. Dependency Injection or Inversion of Control(IOC) principle ("D" In SOLID)
+		1) Reduce coupling		2) Improves testability				3) Flexibility (you can replace non-performance implementation with a better one later)
+
+		Means Don't ask for dependency; it will be provided to you by the framework. This has been very well implemented in Spring framework, 
+		the beauty of this design principle is that any class which is injected by DI framework is easy to test 
+		with the mock object and more comfortable to maintain because object creation code is centralized in the framework and client code 
+		is not littered with that.
+
+		There are multiple ways to implement Dependency injection like using bytecode instrumentation, which some AOP (Aspect Oriented Programming) 
+		framework like AspectJ does or by using proxies just like used in Spring.
+		
+		One of the implementations of DI is Inversion of Control (IOC) on which framework like Spring controls object’s dependency.
+		
+		There are mainly two types of Dependency Injection: Constructor Injection and Setter Injection.	
+		Both have there pros and cons. Constructor DI allows the object to be created in complete state and follows the principle of the fully functional object 
+		while Setter DI allows object to be created without its dependency. which may result in an incomplete object if dependency is not available.
+
+		DI in Use
+		----------
+		public class AuditServiceImpl implements AuditService{
+
+			private IAuditDAO auditDao; // IAuditDAO is prefered to be interface or abstract class
+
+			public void setAuditDao(IAuditDAO AuditDao) {
+				this.AuditDao = AuditDao;
+			}
+		 
+			@Override
+			public boolean audit (String message) {
+			   return auditDao.store(message);
+			}
+		 
+		}
+		Benefits:
+		1. Since AuditDAO is injected here its possible to share single AuditDAO (an expensive object) between multiple AuditService.
+		2. Since AuditServiceImpl is not creating an instance of AuditDAO its no more coupled with AuditDAO and works with any implementation of AuditDAO, 
+		   thanks to another famous object-oriented design principle “Program For Interface than Implementation".
+		3. Because AuditDAO is injected by DI at runtime it's easy to test audit() method by providing a mock AuditDAO class. 
+		   This not only makes testing easier but also independent of environmental changes as you are not using the actual implementation of AuditService.
+
+
+	6. Favor Composition over Inheritance
+		It is more natural and flexbile to build business-domain classes out of various components with and find a "has-a" relation 
+		than trying to find family tree relation or "is-a" relation.
+		One common drawback of using composition instead of inheritance is that methods being provided by individual components may have to be implemented in the derived type.
+		
+		> The Decorator design Pattern is one example of Favor Composition over Inheritance principle.
+	
+	7. Liskov Substitution Principle (LSP) ("L" In SOLID)	
+		Subtypes must be substitutable for supertype, i.e. methods or functions which use superclass type must be able to work with the object of subclass without any issue.
+		If a class has more functionality, than the subclass might not support those functionality this violates LSP. 
+		In other word derived class or subclass must enhance functionality, but not reduce them.
+		
+		i.e if you have a method in Super class and this method is implemented and introduce certain business logic  
+		    and in the subclass, you decided to override this method with empty body or by throw Usupported Operation Exception 
+			This design violates LSP.
+	
+		< LSP is closely related to the "Single Responsibility Principle" and "Interface Segregation Principle". > I DON"T AGREE WITH THAT
+	
+	8. Interface Segregation Principle (ISP) ("I" In SOLID)	 -> "The reason behind the existence of Java Functional & Marker Interfaces" 
+		Means a client should not implement an interface if it will not use all methods introduced by that interface.
+		That's why you can see a lot of Functional & Marker Interfaces in Java.
+		
+		Why we need Marker Interface In Java?
+			Let's take the example of the Cloneable interface. If we try to clone an object that doesn't implement this interface, 
+			the JVM throws a CloneNotSupportedException. 
+			Hence, the Cloneable marker interface is an indicator to the JVM that we can call the Object.clone() method.
+			
+			In the same way, when calling the ObjectOutputStream.writeObject() method, 
+			the JVM checks if the object implements the Serializable marker interface. When it's not the case, 
+			a NotSerializableException is thrown. Therefore, the object isn't serialized to the output stream.
+	
+	9. Programming for Interface not implementation
+		So use interface type on variables, return types of method or argument type of methods in Java.
+		this will lead to flexible code that can work with any new implementation of the interface.
+		Another way to implement "Open Closed Design Principle".
+	
+	10. Delegation principle
+		Means Don't do all stuff by yourself, delegate it to the respective class. 
+		The key benefit of this design principle is no duplication of code and pretty easy to modify behavior.
+		
+		Classical example of delegation design principle is equals() and hashCode() method in Java. In order to compare two objects for equality, 
+		we ask the class itself to make comparison instead of the Client class doing that check.
+
+		Event delegation is another example of this principle, where an event is delegated to Listners for handling. 
+
+		> State & Strategy design patterns are example of Delegation principle
+			In Strategy, the strategy class/interface delegates the implementation to the classes that will implement it.
+			In State, Our context class (the class that has multiple states) is going to delegate the behavior to the state implementation.
+	
+================================================================================================================================================
+																Design Pattern
+																Gang of Four (GOF) 
+															-------------------------
+================================================================================================================================================	
+https://javarevisited.blogspot.com/2015/07/strategy-design-pattern-and-open-closed-principle-java-example.html
+Strategy Pattern > What problem is solved by the Strategy pattern in Java?
+----------------
+	Strategy design pattern is based upon Open Closed Design Principle.
+	It's one of the popular pattern in the field of object-oriented analysis and design along with Decorator, Observer and Factory
+	Strategy pattern allows you to encapsulate possible changes in a process and encapsulate that in a Strategy class.
+	How?
+		By doing that your process (mainly a method) depends upon a strategy, which is a higher level of abstraction than implementation. 
+		This makes your process open for extension by providing new Strategy implementation, 
+		but closed for modification, because the introduction of a new strategy doesn't require a change in a tested method.
+
+	When to use: Strategy pattern is very useful, especially for implementing algorithmic strategy e.g. encryption, compression, comparison.
+			Our varaities are determined by certain choices  
+			such as we have only three types of message filtering in our problem (filter by type, by size, by content) 
+			OR 
+			If you see, your code needs to use different kind of related algorithms, then think of using Strategy pattern 
+			i.e Sorting Algorithms: we need the client to choose between different kind of sorting algorithms and since
+				sorting algorithms can be determined so we can use Strategy Pattern by think of it as each sorting algorithm 
+				is a strategy.
+	
+	In Java:
+		A couple of examples of Strategy pattern from JDK is Comparator and LayoutManager (GridLayout, BorderLayout).
+		The Collections.sort() method which sorts the list of the object uses the Strategy pattern to compare objects. 
+			Since every object uses a different comparison strategy you can compare various objects differently without changing the sort method.
+
+	My Comment
+		Since most of the time you will implement the Strategy Pattern using Functional Interface, we can say this pattern is a friend of 
+		Java8 Lambda Expression
+
+	
+	Example:	
+		In this example, we need to filter the Incoming message by certain criterion e.g. filter message if it's of a particular type. 
+		But you know that this criterion can change, and you may need to filter the message by their size or a specific keyword in their content.
+		By removing them from incoming List of Messages.
+		
+	Solution:
+		We will define a Strategy interface say FilteringStrategy which contains isFilterable(Message msg) method, 
+		this method returns true if Message passed to it is filterable by criteria, implemented by subclasses.
+		
+		We will build three implementations of this FilteringStrategy interface FilterByType, FilterBySize, and FilteryByKeyword.	
+		And our data object Message contains a type, represented by Java Enum, an integer size, and String content.
+		
+		So the code that will use those 3 implementations and the Message class to do filtering using strategy pattern will be as follows:
+		
+		public class StrategyPattern { 
+			private static final Logger logger = LoggerFactory.getLogger(StrategyPattern.class); 
+			public static void main(String args[]) { 
+				List<Message> messages = new ArrayList<>(); 
+				
+				// preparing some data 
+				messages.add(new Message(MessageType.TEXT, 100, "This is test message")); 
+				messages.add(new Message(MessageType.XML, 200, "How are you ")); 
+				messages.add(new Message(MessageType.TEXT, 300, "Does Strategy pattern follows OCP design principle?")); 
+				messages.add(new Message(MessageType.TEXT, 400, "Wrong Message, should be filtered")); 
+				
+				// do filtering for messages 
+				messages = filter(messages, new FilterByType(MessageType.XML)); 
+				messages = filter(messages, new FilterByKeyword("Wrong")); 
+				messages = filter(messages, new FilterBySize(200)); 
+			}
+			// you can provide any filtering criterion by providing implementation of FilteringStrategy, but no need to change any code here. 
+			public static final List<Message> filter(List<Message> messageList, FilteringStrategy strategy){ 
+				Iterator<Message> itr = messageList.iterator(); 
+				while(itr.hasNext()){ 
+					Message msg = itr.next(); 
+					if(strategy.isFilterable(msg)){ 
+						logger.info(strategy.toString() + msg); 
+						itr.remove(); 
+					} 
+				} 
+				return messageList; 
+			} 
+		}
+
+
+https://javarevisited.blogspot.com/2014/04/difference-between-state-and-strategy-design-pattern-java.html
+State Pattern > What is the difference between State and Strategy Patterns?
+-------------		
+	State Pattern
+	When to use: if you need to manage state and state transition, without lots of nested conditional statements, state pattern is the pattern to use.
+
+	Although both are an example of applying OCP, and both have almost the same UML digram,
+	- The most key Different is that, change in Strategy is done by Client, but Change in State can be done by Context or State object itself.
+	- Another different is Order of State transition is well defined in State pattern, there is no such requirement for Strategy pattern. 
+	  Client is free to choose any Strategy implementation of his choice.
+	- In State pattern, individual state can contain reference of Context, to implement state transitions, 
+	  but Strategy doesn't contain reference of Context, where they are used.
+
+	Example:
+		Imagine we have a "package" which is sent to a post office, the package itself can be "ordered", then "delivered" to a post office 
+		and finally "received" by a client. 
+		Now, depending on the actual state, we want to print its delivery status and we want to be able to swith from state to another.
+
+		The simplest approach would be to add some boolean flags and apply simple if/else statements within each of our methods in the class. 
+		That won't complicate it much in a simple scenario. However, it might complicate and pollute our code when we'll get more states to process 
+		which will result in even more if/else statements and will break the OCP concept.
+		Besides, all logic for each of the states would be spread across all methods. Now, this is where the State pattern might be considered to use.
+
+		Our context, that's going to be a Package class and is going to delegate the behavior to the state implementation.
+		
+	Solution:
+		public class Package {
+			private PackageState state = new OrderedState(); // compose the order state to set the inital state for the Package, 
+															 // you don't need this line in strategy pattern	
+						
+			// These 3 methods are delegating the job to the state object
+			public void previousState() {
+				state.prev(this);
+			}
+		 
+			public void nextState() {
+				state.next(this);
+			}
+		 
+			public void printStatus() {
+				state.printStatus();
+			}
+			
+			// 
+			public void setState(PackageState st) {
+				if(st != null) state = st;
+			}
+		}
+		
+		public interface PackageState {
+			void next(Package pkg);
+			void prev(Package pkg);
+			void printStatus();
+		}
+		// Implements "ordered" state but we still need to implement the other 2 states "delivered" and "received" states
+		public class OrderedState implements PackageState {
+			@Override
+			public void next(Package pkg) {
+				pkg.setState(new DeliveredState()); // Move from state to another by comoposition 
+			}
+		 
+			@Override
+			public void prev(Package pkg) {
+				System.out.println("The package is in its root state.");
+			}
+		 
+			@Override
+			public void printStatus() {
+				System.out.println("Package ordered, not delivered to the office yet.");
+			}
+		}
+		
+		//..... More code for other 2 states "delivered" and "received" states
+		
+		@Test
+		public void givenNewPackage_whenPackageReceived_thenStateReceived() {
+			Package pkg = new Package();
+		 
+			assertThat(pkg.getState(), instanceOf(OrderedState.class));
+			pkg.nextState();
+		 
+			assertThat(pkg.getState(), instanceOf(DeliveredState.class));
+			pkg.nextState();
+		 
+			assertThat(pkg.getState(), instanceOf(ReceivedState.class));
+		}
+
+https://www.java67.com/2013/07/decorator-design-pattern-in-java-real-life-example-tutorial.html
+Decorator Pattern > Which OOP concept Decorator design Pattern is based upon?
+------------------
+	The decorator pattern takes advantage of Composition to provide a dynamic way of extending an object's functionality through Composition, 
+	it adds new features without modifying the original class.
+	
+	When to use: Whenever you have undetermined number of strategies or prossibilities for certain method or implementation such as the price of 
+			Sandwiches can be vary based on the extras that can be added to it and these extras has multiple varieties.	
+	
+	One disadvantage of Decorator pattern, it adds lots of small classes in the code base, remember the overwhelming number of classes in the java.io package. 
+	Though, once you know that which classes are main classes, and which are decorators, you tend to get a better understanding of overall structure. 
+	UML diagrams certain help in this case.
+	
+	In Java:
+		A couple of classes from the java.io package like BufferedInputStream, LineNumberInputStream 
+
+	Example:
+		Do we need to create software for calculating the price for a Sandwich, Since the customer can customize a sandwich by asking extra cheese or extra fillings, 
+		you also need to include the cost of those items in the final price of Sandwich. 
+		Since this customization can vary a lot among different customers and offer from a shop, creating classes for different types of Sandwich with different fillings or extras
+		This problem looks a natural fit for applying Decorator pattern because we have a base object Sandwich, which can be decorated with extra cheese and fillings.
+
+		By using the Decorator pattern, you can extend the functionality of Sandwich class at runtime, based upon customer's request, 
+		which is impossible with Inheritance until you have a specific class for every possible customer request. 
+
+	Solution:
+		We have an abstract class "Sandwich", with abstract method "price()"
+		And a concrete implementation class "WhiteBreadSandwich".
+		
+		We have a Decorator abstract class, called "SandwichDecorator"
+		And a concrete implementation of this as "CheeseDecorator"
+		
+		SandwichDecorator extends Sandwich, to be of the same type as the original object, which is getting decorated. 
+		****This is a critical requirement of Decorator pattern so that a decorated object can stand in place of the original object like it 
+		can be passed when a method expects the original object.
+
+		Decorator adds functionality before or after delegating the task to the original object, which means in this example price of a WhilteBreadSandwich 
+		with Cheese will be calculated by the first calculating price of WhiteBreadSandwich and then the price of Cheese. 
+
+		Finally, I have a class called SandwichMaker, it will test the whole program and demonstrate how Decorator pattern adds new functionality on the fly at runtime. 
+
+		****I have also used BigDecimal to represent money instead of double primitive to follow best practices suggested in Effective Java. 
+		If you don't know why to read this Java mistake about using double to represent the price.
+		
+		public abstract class Sandwich {  // It can be an Interface 
+			protected String description = "Sandwich"; 
+			public String getDescription(){ return description; } 
+			public abstract BigDecimal price(); 
+		}
+		
+		public class WhiteBreadSandWich extends Sandwich { 
+			public WhiteBreadSandWich(String desc){ description = desc; } 
+			@Override 
+			public BigDecimal price() { return new BigDecimal("3.0"); } 
+		}
+		
+		public abstract class SandWichDecorator extends Sandwich { 
+			@Override 
+			public abstract BigDecimal price(); 
+		}
+		
+		public class CheeseDecorator extends SandWichDecorator { 
+			Sandwich currentSandwich; // Compose the Sandwich base class
+			public CheeseDecorator(Sandwich sw){ currentSandwich = sw; } 
+			@Override 
+			public String getDescription(){ return currentSandwich.getDescription() + ", Cheese"; } 
+			@Override 
+			public BigDecimal price() { return currentSandwich.price().add(new BigDecimal("0.50")); } 
+		}
+
+		public class SandwichMaker {   
+			public static void main(String args[]){			  
+				Sandwich mySandwich = new WhiteBreadSandWich("White bread Sandwich");
+				System.out.printf("Price of %s is $%.2f %n", mySandwich.getDescription(), 
+															 mySandwich.price());
+			   
+				//adding extra cheese using Decorator Pattter
+				mySandwich = new CheeseDecorator(mySandwich);
+				System.out.printf("Price of %s is $%.2f %n", mySandwich.getDescription(), 
+															 mySandwich.price());
+			}
+		}
+
+
+https://javarevisited.blogspot.com/2015/01/adapter-vs-decorator-vs-facade-vs-proxy-pattern-java.html
+Decorator, Proxy, Adapter, Facade > What is the difference between Decorator, Proxy, Adapter, Facade pattern in Java?
+-----------------------------------
+	all of them use Composition and delegation to solve the problem.
+	
+	The Purpose:	
+		Adapter let's two components working together, which wouldn't be working because of incompatible interfaces.
+		Decorator pattern, adds new functionalities at runtime. It allows you to enrich the object, even after it's creation.
+		Facade design pattern neither converts interfaces nor adds new functionality, instead, it just provides simpler interfaces.
+		Proxy pattern is also quite similar to Decorator, but it's purpose is to control access of object.
+			Proxy prevents client's to directly accessing object, instead it act as real object and can provide alternate behavior or forward request to original object.
+	
+	The Structure:
+		The Adapter pattern wraps an interface, and delegates call to it.
+		The Decorator wraps an object of target class (Sandwich) and implements behavior on top of that, but at the same time 
+			it extends from a base decorator class which in turn extends from the base class of target class.
+		Facade wraps one or more interface/class to provide a central interface, it just compose all objects of some complicated classes, 
+			to act as a face layer which is easy to use and hide these complixity from the client.
+			So the client delegats all the complixity to the Facade Class.
+		Proxy Pattern also wraps Subject and delegates calls to it, to control access for Object 
+			or doing some preparation steps before calling the actual implementation.
+			i.e some sort of security, some sort of controlling on hide/display from rendering some controls on screen.
+	
+	Similarity & Differences from structure point of view
+		Both Decorator and Proxy pattern are meant to stay in place of original object, that's why both Decorator and Proxy pattern "implements/extends"
+		interface of real object. Because of this nature, a decorator and proxy can be passed to a method, which accepts original or real object.
+
+		Both Adapter and Facade pattern can wrap multiple interfaces, 
+		which is also a different than Decorator and Proxy pattern, because they tend to operate on one object.
+	
+	
+
+	Proxy is most versatile pattern of all these, and it can be used in different ways like:
+		Remote proxy for communicating with remote object, 
+		Virtual proxy to control access of expensive object, 
+		Protection proxy to provide access to object based on roles, 
+		Caching proxy which can return cached object.
+
+Singleton Pattern > When to use the Singleton design pattern in Java? (Creational)
+------------------
+	When we need just one instance of a class and want that to be globally available then you can use the Singleton pattern. 
+	It's not free of cost though because it increases the coupling between classes and makes them hard to test.
+
+	
+Template Method Pattern > What is Template Method Design pattern?
+------------------------
+	In Template Method Design pattern, the template method should be declared as final to prevent overriding.		
+	Template means Preset format like HTML templates which has a fixed preset format.
+	Similarly in the template method pattern, 
+		we have a preset structure method called template method which consists of steps. 
+		This steps can be an abstract method(s) which will be implemented by its subclasses.
+	
+	Somthing like: 
+		public abstract class ComputerBuilder {
+			// ... ComputerParts composition code
+		
+			// Template Method
+			public final Computer buildComputer() {
+				addMotherboard();
+				setupMotherboard();
+				addProcessor();
+				return new Computer(computerParts);
+			}
+			// Abstract methods as steps to build up a Computer
+			public abstract void addMotherboard();
+			public abstract void setupMotherboard();
+			public abstract void addProcessor();		
+		}
+		
+		// override step abstract methods
+		public class StandardComputerBuilder extends ComputerBuilder {...}
+	
+		// then to use this above structure code 
+		new StandardComputerBuilder()
+		  .buildComputer();
+		  .getComputerParts() // method that return a Map
+		  .forEach((k, v) -> System.out.println("Part : " + k + " Value : " + v));
+	
+	When to use: if you have a problem that can be done in very well determined steps
+				i.e Steps to build computer, Steps to build certain order (select items step, payment step, and gift wrap step - Optional step) 
+				
+	
+	In Java:
+		 java.util.AbstractList, or java.util.AbstractSet.
+		 An example of a template method can be the addAll() method, although it's not explicitly defined as final.
+		 
+		 public boolean addAll(int index, Collection<? extends E> c) {
+			rangeCheckForAdd(index);
+			boolean modified = false;
+			for (E e : c) {
+				add(index++, e); // step method
+				modified = true;
+			}
+			return modified;
+		}
+		
+		// Users only need to implement the add() method:
+		public void add(int index, E element) {
+			throw new UnsupportedOperationException();
+		}
+	
+Builder Pattern > 
+-----------------
+	In Java:
+		java.lang.StringBuilder#append() 
+		java.lang.StringBuffe#append()
+		
+		StringBuilder builder = new StringBuilder("Temp");
+		String data = builder.append(1)
+						.append(true)
+						.append("friend")
+						.toString();
+
+
+	Let's understand the value from using this pattern by example
+		Let say we have class user that has a lot of fields, the constructor that initialze all fields will be somthing like that
+			public User (String firstName, String lastName, int age, String phone, String address){
+				this.firstName = firstName;
+				this.lastName = lastName;
+				this.age = age;
+				this.phone = phone;
+				this.address = address;
+			}
+			But what if the number of the mandatory fields start to be changed 
+			Now We need more constructors:
+			public User (String firstName, String lastName, int age, String phone){ ... }
+			public User (String firstName, String lastName, String phone, String address){ ...  }
+			public User (String firstName, String lastName, int age){ ...   }
+			public User (String firstName, String lastName){ ...    }
+			
+			We will need some more like above. Still can manage? Now let’s introduce our sixth attribute i.e. salary. Now it is problem.
+			
+			A sample implementation using Builder Pattern
+			public class User {
+				//All final attributes
+				private final String firstName; // required
+				private final String lastName; // required
+				private final int age; // optional
+				private final String phone; // optional
+				private final String address; // optional
+			 
+				private User(UserBuilder builder) { // constructor is marked as private
+					this.firstName = builder.firstName;
+					this.lastName = builder.lastName;
+					this.age = builder.age;
+					this.phone = builder.phone;
+					this.address = builder.address;
+				}
+			 
+				//All getter, and NO setter to provde immutability
+				public String getFirstName() {
+					return firstName;
+				}
+				public String getLastName() {
+					return lastName;
+				}
+				public int getAge() {
+					return age;
+				}
+				public String getPhone() {
+					return phone;
+				}
+				public String getAddress() {
+					return address;
+				}			
+			 
+				// Inner class
+				public static class UserBuilder {
+					private final String firstName;
+					private final String lastName;
+					private int age;
+					private String phone;
+					private String address;
+			 
+					// Constructor for manadatory fields
+					public UserBuilder(String firstName, String lastName) {
+						this.firstName = firstName;
+						this.lastName = lastName;
+					}
+					
+					// methods that set the other optional fields and yet return object from same class builder, so it can be chained
+					public UserBuilder age(int age) {
+						this.age = age;
+						return this;
+					}
+					public UserBuilder phone(String phone) {
+						this.phone = phone;
+						return this;
+					}
+					public UserBuilder address(String address) {
+						this.address = address;
+						return this;
+					}
+					//Return the finally consrcuted User object
+					public User build() {
+						User user =  new User(this);
+						validateUserObject(user);
+						return user;
+					}
+					private void validateUserObject(User user) {
+						//Do some basic validations to check 
+						//if user object does not break any assumption of system
+					}
+				}
+			}
+			
+			Usage:
+			User user1 = new User.UserBuilder("Lokesh", "Gupta")
+								.age(30)
+								.phone("1234567")
+								.address("Fake address 1234")
+								.build();
+			
+		 
+Other Patterns >
+-----------------
+	Flyweight, 		 
+			I used Flyweight when I was handling the WorkFlow from the process engin which is another class and because of the WorFlow structure and data are saved
+			as XML file in the database, so at certain point I need to get this xml from database, then I saved it in the Map collection
+			Then by using JAXB to generate the corresponding objects from this xml, so the process engin can deal with the regular objects
+			representing the structure of current workflow as well as the settings in this workflow.	
+	
+	Prototype, cloning 
+	Iterator, Sequentially access the elements of a collection
+	Memento, Capture and restore an object's internal state
+	Observer, A way of notifying change to a number of classes
+

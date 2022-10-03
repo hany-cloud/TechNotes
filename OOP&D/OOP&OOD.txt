@@ -191,8 +191,19 @@ Object-Oriented Design Principles
 		If you put more than one functionality in one Class, it introduces coupling between two functionality, 
 			and even if you change one feature, there is a chance you broke coupled functionality, which requires another round of testing.
 
-	5. Dependency Injection or Inversion of Control(IOC) principle ("D" In SOLID)
-		1) Reduce coupling		2) Improves testability				3) Flexibility (you can replace non-performance implementation with a better one later)
+	5. Dependency Inversion principle ("D" In SOLID)
+		Difference between dependency injection and dependency inversion
+		https://stackoverflow.com/questions/46709170/difference-between-dependency-injection-and-dependency-inversion
+		
+		The Dependency Inversion Principle (DIP) is a software design guideline which boils down to two recommendations about de-coupling a class from its concrete dependencies:
+			- 'High-level modules should not depend on low-level modules. Both should depend on abstractions.'
+			- 'Abstractions should not depend upon details. Details should depend upon abstractions.'
+		Or, to put it even more succinctly:
+		Dependency Injection (DI)  is an implementation technique for populating instance variables of a class.
+		Dependency Inversion (DIP) is a general design guideline which recommends that classes should only have direct relationships with high-level abstractions.
+
+		Dependency Injection or Inversion of Control(IOC)
+			1) Reduce coupling		2) Improves testability				3) Flexibility (you can replace non-performance implementation with a better one later)
 
 		Means Don't ask for dependency; it will be provided to you by the framework. This has been very well implemented in Spring framework, 
 		the beauty of this design principle is that any class which is injected by DI framework is easy to test 
